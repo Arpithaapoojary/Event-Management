@@ -38,8 +38,12 @@ export default function Navbar() {
           </Link>
 
           <Link
-            to="/admin/login"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 border border-slate-200 transition-all"
+            to="/admin"
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+              isAdmin
+                ? 'text-indigo-600 bg-indigo-50 border border-indigo-200'
+                : 'text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 border border-slate-200'
+            }`}
           >
             <ShieldCheck className="w-4 h-4 text-indigo-500" />
             <span>Admin Portal</span>

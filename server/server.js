@@ -28,6 +28,7 @@ app.get('/api/health', (req, res) => {
 
 // Route Mounts
 app.use('/api/events', require('./routes/eventRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // 404 Handler for undefined routes
 app.use((req, res) => {

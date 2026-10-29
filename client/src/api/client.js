@@ -7,6 +7,15 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to attach admin key if logged in
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('admin_token');
+  if (token) {
+    config.headers['x-admin-key'] = token;
+  }
+  return config;
+});
+
 // Response interceptor for consistent error handling
 api.interceptors.response.use(
   (response) => response.data,
