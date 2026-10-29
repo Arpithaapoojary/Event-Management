@@ -1,4 +1,5 @@
 const Event = require('../models/Event');
+const Registration = require('../models/Registration');
 
 // @desc    Get all events with optional status filtering and search
 // @route   GET /api/events
@@ -69,6 +70,106 @@ exports.getEventById = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Register attendee for an event
+// @route   POST /api/events/:id/register
+// @access  Public
+exports.registerForEvent = async (req, res, next) => {
+  try {
+    const { fullName, email, contactNumber } = req.body;
+    const eventId = req.params.id;
+
+    // 1. Validate required fields
+    if (!fullName || !email || !contactNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name, email address, and contact number are all required.',
+      });
+    }
+
+    // Basic format checks
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.',
+      });
+    }
+
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/;
+    if (!phoneRegex.test(contactNumber.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid contact phone number (at least 7 digits).',
+      });
+    }
+
+    // 2. Fetch event and check existence
+    const event = await Event.findOne({ _id: eventId, isDeleted: false });
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found or is no longer available.',
+      });
+    }
+
+    const now = new Date();
+    // 3. Prevent registration for past events
+    if (new Date(event.dateTime) < now) {
+      return res.status(400).json({
+        success: false,
+        message: 'Registration is closed. This event has already taken place.',
+      });
+    }
+
+    // 4. Prevent registration if capacity reached
+    if (event.registeredCount >= event.capacity) {
+      return res.status(400).json({
+        success: false,
+        message: 'Registration is closed. This event has reached full capacity.',
+      });
+    }
+
+    // 5. Prevent duplicate registration by email for this event
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingRegistration = await Registration.findOne({
+      event: event._id,
+      email: normalizedEmail,
+    });
+
+    if (existingRegistration) {
+      return res.status(409).json({
+        success: false,
+        message: 'You are already registered for this event with this email address.',
+      });
+    }
+
+    // 6. Create registration record
+    const registration = await Registration.create({
+      event: event._id,
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      contactNumber: contactNumber.trim(),
+    });
+
+    // 7. Increment registered count atomically
+    event.registeredCount = (event.registeredCount || 0) + 1;
+    await event.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Registration confirmed successfully!',
+      data: {
+        registration,
+        seatsLeft: event.seatsLeft,
+        registeredCount: event.registeredCount,
+        status: event.status,
+      },
     });
   } catch (error) {
     next(error);
