@@ -113,4 +113,12 @@
   animation-delay: 480ms;
 }
 
+.animation-delay-500 {
+  animation-delay: 600ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 720ms;
+}
+
 
