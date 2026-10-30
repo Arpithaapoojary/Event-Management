@@ -29,10 +29,16 @@ const RegistrationSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Contact number is required'],
       trim: true,
-      match: [
-        /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/,
-        'Please provide a valid contact number (7-15 digits)',
-      ],
+      validate: {
+        validator: function (v) {
+          const raw = (v || '').replace(/[\s\-()+]/g, '');
+          let core = raw;
+          if (raw.startsWith('91') && raw.length === 12) core = raw.slice(2);
+          else if (raw.startsWith('0') && raw.length === 11) core = raw.slice(1);
+          return /^[6-9]\d{9}$/.test(core);
+        },
+        message: 'Please provide a valid 10-digit Indian phone number (starting with 6, 7, 8, or 9)',
+      },
     },
   },
   {

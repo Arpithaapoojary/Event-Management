@@ -340,16 +340,6 @@ export default function HomePage() {
             >
               Registration Open
             </button>
-            <button
-              onClick={() => setActiveTab('past')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'past'
-                  ? 'bg-slate-950 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-950'
-              }`}
-            >
-              Past
-            </button>
           </div>
 
           {/* Search Input Box */}

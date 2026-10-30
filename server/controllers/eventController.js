@@ -115,11 +115,19 @@ exports.registerForEvent = async (req, res, next) => {
       });
     }
 
-    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/;
-    if (!phoneRegex.test(contactNumber.trim())) {
+    // Indian 10-digit phone number check (allows optional +91, 91, or 0 prefix, must have 10 digits starting with 6, 7, 8, or 9)
+    const rawDigits = contactNumber.trim().replace(/[\s\-()+]/g, '');
+    let corePhone = rawDigits;
+    if (rawDigits.startsWith('91') && rawDigits.length === 12) {
+      corePhone = rawDigits.slice(2);
+    } else if (rawDigits.startsWith('0') && rawDigits.length === 11) {
+      corePhone = rawDigits.slice(1);
+    }
+
+    if (!/^[6-9]\d{9}$/.test(corePhone)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid contact phone number (at least 7 digits).',
+        message: 'Please provide a valid 10-digit Indian phone number (starting with 6, 7, 8, or 9).',
       });
     }
 
