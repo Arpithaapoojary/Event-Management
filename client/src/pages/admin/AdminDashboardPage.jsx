@@ -216,13 +216,13 @@ export default function AdminDashboardPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-2">
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Institutional Administration</span>
+              <span>Event Operations</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Admin Management Portal
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Oversee campus events, attendee registrations, and schedule operations
+              Oversee event listings, attendee registrations, and schedule operations
             </p>
           </div>
 

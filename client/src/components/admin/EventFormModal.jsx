@@ -197,7 +197,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g. Annual Campus AI Summit 2026"
+              placeholder="e.g. Annual AI &amp; Tech Summit 2026"
               className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-white focus:outline-none transition ${
                 errors.title
                   ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'

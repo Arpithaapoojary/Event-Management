@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">Admin Portal Access</h2>
           <p className="text-xs text-slate-300 mt-1">
-            Restricted to institution event coordinators and administrators
+            Restricted to authorized event coordinators and administrators
           </p>
         </div>
 

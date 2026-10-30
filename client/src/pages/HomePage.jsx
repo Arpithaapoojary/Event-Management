@@ -58,19 +58,19 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold mb-6">
             <Sparkles className="w-4 h-4 text-indigo-600" />
-            <span>Discover Campus Opportunities &amp; Workshops</span>
+            <span>Discover Upcoming Events &amp; Workshops</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
-            Institution Event Management <br className="hidden sm:inline" />
+            Event Discovery &amp; Management <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-              Campus Portal
+              Platform
             </span>
           </h1>
 
           <p className="max-w-2xl mx-auto text-slate-600 text-base sm:text-lg leading-relaxed mb-8">
-            Explore upcoming hackathons, tech workshops, guest lectures, and placement sessions.
-            Reserve your seat with verified registration.
+            Explore upcoming hackathons, technical workshops, seminars, and networking sessions.
+            Reserve your seat with simple, instant registration.
           </p>
 
           {/* Search Box */}

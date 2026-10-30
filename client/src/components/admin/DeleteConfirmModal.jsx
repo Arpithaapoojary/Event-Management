@@ -54,7 +54,7 @@ export default function DeleteConfirmModal({
           <div className="mt-3.5 flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-800 leading-normal">
             <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <span>
-              <strong>Data Integrity Guarantee:</strong> This performs a soft-deletion. All registration records and attendee history remain securely preserved in the database for institutional reporting.
+              <strong>Data Integrity Guarantee:</strong> This performs a soft-deletion. All registration records and attendee history remain securely preserved in the database for reporting and auditing.
             </span>
           </div>
 

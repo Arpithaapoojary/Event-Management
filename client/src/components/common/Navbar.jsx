@@ -22,10 +22,10 @@ export default function Navbar() {
           </div>
           <div>
             <span className="font-extrabold text-lg tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
-              Parrophins
+              EventFlow
             </span>
             <span className="text-xs block text-slate-500 font-medium -mt-1">
-              Events Portal
+              Events Platform
             </span>
           </div>
         </Link>

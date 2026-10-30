@@ -295,7 +295,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    placeholder="e.g. john@university.edu"
+                    placeholder="e.g. alex@example.com"
                     disabled={isSubmitting}
                     className={`w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border bg-white focus:outline-none transition ${
                       errors.email
