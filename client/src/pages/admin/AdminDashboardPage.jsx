@@ -22,7 +22,6 @@ import {
   ShieldCheck,
   ArrowLeft,
   Layers,
-  TrendingUp,
   Cpu,
   Trophy,
   Palette,
@@ -278,12 +277,6 @@ export default function AdminDashboardPage() {
     document.body.removeChild(link);
   };
 
-  // Calculate total capacity across all events
-  const totalCapacity = events.reduce((sum, ev) => sum + (ev.capacity || 0), 0);
-  const overallUtilization = totalCapacity > 0
-    ? Math.round((stats.totalRegistrations / totalCapacity) * 100)
-    : 0;
-
   // Helper for Category badge rendering (No emojis, clean SVG icons)
   const renderCategoryBadge = (category) => {
     const cat = category || 'Cultural';
@@ -378,7 +371,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* 2. STANDALONE SPACIOUS KPI METRIC CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Card 1: Total Published Events */}
           <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
             <div className="flex items-center justify-between mb-4">
@@ -397,61 +390,11 @@ export default function AdminDashboardPage() {
             </span>
           </div>
 
-          {/* Card 2: Campus Arenas */}
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Campus Arenas
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                <Layers className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => {
-                  setActiveTab('events');
-                  setEventCategoryFilter('Cultural');
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200/80 transition cursor-pointer"
-                title="Filter Cultural Events"
-              >
-                <Palette className="w-3.5 h-3.5 text-amber-600" />
-                <span>{culturalCount} Cultural</span>
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab('events');
-                  setEventCategoryFilter('Technical');
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200/80 transition cursor-pointer"
-                title="Filter Technical Events"
-              >
-                <Cpu className="w-3.5 h-3.5 text-blue-600" />
-                <span>{technicalCount} Tech</span>
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab('events');
-                  setEventCategoryFilter('Sports');
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200/80 transition cursor-pointer"
-                title="Filter Sports Events"
-              >
-                <Trophy className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{sportsCount} Sports</span>
-              </button>
-            </div>
-            <span className="text-xs text-slate-400 mt-2 block font-medium">
-              Click any arena to filter
-            </span>
-          </div>
-
-          {/* Card 3: Student Passes */}
+          {/* Card 2: Student Passes */}
           <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Student Passes
+                Student Passes Issued
               </span>
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                 <Users className="w-5 h-5" />
@@ -463,27 +406,6 @@ export default function AdminDashboardPage() {
             <span className="text-xs text-emerald-700 font-semibold mt-1.5 block">
               Active Verified Attendee Records
             </span>
-          </div>
-
-          {/* Card 4: Seating Utilization */}
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Capacity Filled
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {overallUtilization}%
-            </div>
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mt-3">
-              <div
-                className="h-full bg-slate-900 rounded-full transition-all duration-700 ease-out"
-                style={{ width: `${overallUtilization}%` }}
-              />
-            </div>
           </div>
         </div>
 
