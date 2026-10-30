@@ -25,7 +25,7 @@ export default function EventCard({ event }) {
   );
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 flex flex-col justify-between">
+    <div className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col justify-between">
       {/* Top Banner Image with Status Badge overlay */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
         <img
@@ -40,16 +40,16 @@ export default function EventCard({ event }) {
       </div>
 
       {/* Card Content */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      <div className="p-5 flex-1 flex flex-col justify-between bg-white">
         <div>
           {/* Date & Time chip */}
           <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 mb-2.5">
-            <Calendar className="w-3.5 h-3.5" />
+            <Calendar className="w-3.5 h-3.5 text-indigo-500" />
             <span>{formattedDate} • {formattedTime}</span>
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 mb-2">
+          <h3 className="font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 mb-2">
             {event.title}
           </h3>
 
@@ -72,7 +72,7 @@ export default function EventCard({ event }) {
               <Users className="w-3.5 h-3.5 text-slate-400" />
               <span>Capacity</span>
             </span>
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-slate-800">
               {event.registeredCount || 0} / {event.capacity}
             </span>
           </div>
@@ -93,7 +93,7 @@ export default function EventCard({ event }) {
           {/* View Details / Register Button */}
           <Link
             to={`/events/${event._id || event.id}`}
-            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all shadow-sm group-hover:shadow bg-slate-900 text-white hover:bg-indigo-600"
+            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all shadow-xs group-hover:shadow bg-slate-900 text-white hover:bg-indigo-600"
           >
             <span>View Details</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
