@@ -9,6 +9,7 @@ import {
   Sparkles,
   AlertCircle,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import api from '../api/client';
 import StatusBadge from '../components/common/StatusBadge';
@@ -97,6 +98,33 @@ export default function EventDetailPage() {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Events Catalog</span>
         </Link>
+
+        {/* Success Registration Notice Banner */}
+        {registrationMessage && (
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start sm:items-center justify-between gap-3 shadow-sm animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0 shadow-sm">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="font-extrabold text-sm text-emerald-950 flex items-center gap-2">
+                  <span>Registration Confirmed!</span>
+                  <span className="text-[11px] font-semibold bg-emerald-200/60 text-emerald-800 px-2 py-0.5 rounded-full">
+                    Success
+                  </span>
+                </h4>
+                <p className="text-xs text-emerald-700 mt-0.5">{registrationMessage}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setRegistrationMessage(null)}
+              className="p-1 rounded-lg text-emerald-600 hover:text-emerald-950 hover:bg-emerald-100/60 transition"
+              aria-label="Dismiss banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Hero Banner Card */}
         <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-8">
@@ -188,7 +216,22 @@ export default function EventDetailPage() {
                 </span>
               </div>
 
-              {event.status === 'UPCOMING' ? (
+              {registrationMessage ? (
+                <div className="flex flex-col sm:flex-row items-center gap-2">
+                  <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm border border-emerald-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>You're Registered</span>
+                  </div>
+                  {event.status === 'UPCOMING' && event.seatsLeft > 0 && (
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline px-2 py-1"
+                    >
+                      Register another attendee
+                    </button>
+                  )}
+                </div>
+              ) : event.status === 'UPCOMING' ? (
                 <button
                   id="register-now-btn"
                   onClick={() => setIsModalOpen(true)}
@@ -217,12 +260,12 @@ export default function EventDetailPage() {
             if (result) {
               setEvent((prev) => ({
                 ...prev,
-                registeredCount: result.registeredCount,
-                seatsLeft: result.seatsLeft,
-                status: result.status,
+                registeredCount: result.registeredCount ?? ((prev.registeredCount || 0) + 1),
+                seatsLeft: result.seatsLeft !== undefined ? result.seatsLeft : Math.max(0, (prev.seatsLeft || 1) - 1),
+                status: result.status || (result.seatsLeft === 0 ? 'FULL' : prev.status),
               }));
               setRegistrationMessage(
-                `Success! You are confirmed for ${event.title}.`
+                `Success! You are confirmed for "${event.title}". Your digital ticket reference has been issued.`
               );
             }
           }}

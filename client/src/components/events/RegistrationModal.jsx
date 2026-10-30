@@ -20,6 +20,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
     contactNumber: '',
   });
 
+  const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -27,57 +28,97 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
 
   if (!isOpen || !event) return null;
 
-  // Validation function
+  // Single field validation
+  const validateField = (name, value) => {
+    const val = value.trim();
+    if (name === 'fullName') {
+      if (!val) return 'Full name is required';
+      if (val.length < 2) return 'Full name must be at least 2 characters';
+      if (val.length > 100) return 'Full name cannot exceed 100 characters';
+      if (!/^[a-zA-Z\s'-]+$/.test(val)) return 'Name can only contain letters, spaces, and hyphens';
+      return null;
+    }
+
+    if (name === 'email') {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!val) return 'Email address is required';
+      if (!emailRegex.test(val)) return 'Please enter a valid email (e.g. name@domain.com)';
+      return null;
+    }
+
+    if (name === 'contactNumber') {
+      const digitsOnly = val.replace(/\D/g, '');
+      const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/;
+      if (!val) return 'Contact phone number is required';
+      if (!phoneRegex.test(val) || digitsOnly.length < 7 || digitsOnly.length > 15) {
+        return 'Please enter a valid phone number (7 to 15 digits)';
+      }
+      return null;
+    }
+    return null;
+  };
+
+  // Validate entire form
   const validate = () => {
-    const errs = {};
-    if (!formData.fullName.trim()) {
-      errs.fullName = 'Full name is required';
-    } else if (formData.fullName.trim().length < 2) {
-      errs.fullName = 'Full name must be at least 2 characters';
-    }
+    const errs = {
+      fullName: validateField('fullName', formData.fullName),
+      email: validateField('email', formData.email),
+      contactNumber: validateField('contactNumber', formData.contactNumber),
+    };
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!formData.email.trim()) {
-      errs.email = 'Email address is required';
-    } else if (!emailRegex.test(formData.email.trim())) {
-      errs.email = 'Please enter a valid email address';
-    }
+    const filteredErrs = Object.fromEntries(
+      Object.entries(errs).filter(([_, v]) => v !== null)
+    );
+    setErrors(filteredErrs);
+    return Object.keys(filteredErrs).length === 0;
+  };
 
-    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/;
-    if (!formData.contactNumber.trim()) {
-      errs.contactNumber = 'Contact number is required';
-    } else if (!phoneRegex.test(formData.contactNumber.trim())) {
-      errs.contactNumber = 'Please enter a valid phone number (at least 7 digits)';
-    }
-
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const errorMsg = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
+
+    // If field was previously touched, re-validate on change
+    if (touched[name]) {
+      const errorMsg = validateField(name, value);
+      setErrors((prev) => ({ ...prev, [name]: errorMsg }));
     }
     if (apiError) setApiError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({ fullName: true, email: true, contactNumber: true });
+
     if (!validate()) return;
 
     try {
       setIsSubmitting(true);
       setApiError(null);
 
-      const res = await api.post(`/events/${event._id}/register`, formData);
+      const res = await api.post(`/events/${event._id}/register`, {
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        contactNumber: formData.contactNumber.trim(),
+      });
 
-      if (res.data && res.data.success) {
-        setRegistrationSuccessData(res.data.data);
+      // Handle both direct and intercepted responses safely
+      const isSuccess = res?.success || res?.data?.success;
+      const data = res?.data || res;
+
+      if (isSuccess || res?.message?.toLowerCase().includes('success')) {
+        setRegistrationSuccessData(data);
         if (onSuccess) {
-          onSuccess(res.data.data);
+          onSuccess(data);
         }
+      } else {
+        setApiError(res?.message || 'Registration could not be completed.');
       }
     } catch (err) {
       setApiError(
@@ -91,6 +132,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
   const handleClose = () => {
     if (isSubmitting) return;
     setFormData({ fullName: '', email: '', contactNumber: '' });
+    setTouched({});
     setErrors({});
     setApiError(null);
     setRegistrationSuccessData(null);
@@ -145,41 +187,45 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
           {registrationSuccessData ? (
             /* Success State */
             <div className="text-center py-2 animate-fade-in">
-              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50">
-                <CheckCircle2 className="w-8 h-8" />
+              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50 shadow-md shadow-emerald-500/20">
+                <CheckCircle2 className="w-10 h-10" />
               </div>
 
-              <h4 className="text-xl font-extrabold text-slate-900 mb-1">
-                Registration Confirmed!
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold mb-2">
+                <span>✓ Successfully Registered</span>
+              </div>
+
+              <h4 className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
+                You're Confirmed!
               </h4>
-              <p className="text-xs sm:text-sm text-slate-600 mb-6">
-                You're registered for this event. A confirmation record has been created.
+              <p className="text-xs sm:text-sm text-slate-600 mb-6 max-w-sm mx-auto">
+                Your registration was successfully processed. Your seat is confirmed for <span className="font-semibold text-slate-800">{event.title}</span>.
               </p>
 
               {/* Digital Pass Card */}
-              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-left mb-6 space-y-2.5">
-                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200">
-                  <span className="text-xs font-semibold text-slate-500">Attendee</span>
+              <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 text-left mb-6 space-y-3 shadow-inner">
+                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+                  <span className="text-xs font-semibold text-slate-500">Attendee Name</span>
                   <span className="text-xs font-bold text-slate-900">
                     {registrationSuccessData.registration?.fullName || formData.fullName}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200">
-                  <span className="text-xs font-semibold text-slate-500">Email Address</span>
+                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
+                  <span className="text-xs font-semibold text-slate-500">Registered Email</span>
                   <span className="text-xs font-medium text-slate-700">
                     {registrationSuccessData.registration?.email || formData.email}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200">
+                <div className="flex justify-between items-center pb-2.5 border-b border-slate-200/80">
                   <span className="text-xs font-semibold text-slate-500">Contact Number</span>
                   <span className="text-xs font-medium text-slate-700">
                     {registrationSuccessData.registration?.contactNumber || formData.contactNumber}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-semibold text-slate-500">Ticket Reference</span>
-                  <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                    #REG-{registrationSuccessData.registration?._id?.slice(-6).toUpperCase() || 'CONFIRMED'}
+                <div className="flex justify-between items-center pt-0.5">
+                  <span className="text-xs font-semibold text-slate-500">Registration Pass #</span>
+                  <span className="text-xs font-mono font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-200">
+                    #REG-{registrationSuccessData.registration?._id ? registrationSuccessData.registration._id.slice(-6).toUpperCase() : 'CONFIRMED'}
                   </span>
                 </div>
               </div>
@@ -187,18 +233,18 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
               <button
                 type="button"
                 onClick={handleClose}
-                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition shadow-md"
+                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition shadow-lg shadow-slate-900/10 active:scale-98"
               >
                 Close & Return to Event
               </button>
             </div>
           ) : (
             /* Registration Form */
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {apiError && (
                 <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2.5 animate-shake">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{apiError}</span>
+                  <span className="font-medium">{apiError}</span>
                 </div>
               )}
 
@@ -216,17 +262,21 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="e.g. John Doe"
                     disabled={isSubmitting}
                     className={`w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border bg-white focus:outline-none transition ${
                       errors.fullName
-                        ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
                         : 'border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100'
                     }`}
                   />
                 </div>
                 {errors.fullName && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{errors.fullName}</p>
+                  <p className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>{errors.fullName}</span>
+                  </p>
                 )}
               </div>
 
@@ -244,20 +294,24 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="e.g. john@university.edu"
                     disabled={isSubmitting}
                     className={`w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border bg-white focus:outline-none transition ${
                       errors.email
-                        ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
                         : 'border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100'
                     }`}
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{errors.email}</p>
+                  <p className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>{errors.email}</span>
+                  </p>
                 )}
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Used as your unique registration identifier for this event.
+                  One registration per email address is permitted for this event.
                 </p>
               </div>
 
@@ -275,17 +329,21 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                     name="contactNumber"
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    placeholder="e.g. +1 555-019-2834 or 9876543210"
+                    onBlur={handleBlur}
+                    placeholder="e.g. 9876543210 or +1 555-019-2834"
                     disabled={isSubmitting}
                     className={`w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border bg-white focus:outline-none transition ${
                       errors.contactNumber
-                        ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-2 focus:ring-rose-100'
                         : 'border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100'
                     }`}
                   />
                 </div>
                 {errors.contactNumber && (
-                  <p className="text-xs text-rose-600 mt-1 font-medium">{errors.contactNumber}</p>
+                  <p className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>{errors.contactNumber}</span>
+                  </p>
                 )}
               </div>
 

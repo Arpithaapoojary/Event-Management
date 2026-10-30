@@ -92,6 +92,20 @@ exports.registerForEvent = async (req, res, next) => {
       });
     }
 
+    if (fullName.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name must be at least 2 characters.',
+      });
+    }
+
+    if (fullName.trim().length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Full name cannot exceed 100 characters.',
+      });
+    }
+
     // Basic format checks
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email.trim())) {
