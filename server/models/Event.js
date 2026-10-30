@@ -38,6 +38,13 @@ const EventSchema = new mongoose.Schema(
       type: String,
       default: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80',
     },
+    category: {
+      type: String,
+      enum: ['Cultural', 'Technical', 'Sports', 'Other'],
+      default: 'Cultural',
+      trim: true,
+      index: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

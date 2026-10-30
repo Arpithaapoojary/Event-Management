@@ -10,6 +10,7 @@ import {
   Loader2,
   Sparkles,
   Check,
+  Tag,
 } from 'lucide-react';
 import api from '../../api/client';
 
@@ -35,6 +36,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
     venue: '',
     capacity: 50,
     imageUrl: '',
+    category: 'Cultural',
   });
 
   const [errors, setErrors] = useState({});
@@ -50,6 +52,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         venue: event.venue || '',
         capacity: event.capacity || 50,
         imageUrl: event.imageUrl || '',
+        category: event.category || 'Cultural',
       });
     } else {
       // Default initial state for new event (tomorrow at 10:00 AM)
@@ -64,6 +67,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         venue: '',
         capacity: 50,
         imageUrl: FALLBACK_PREVIEW,
+        category: 'Cultural',
       });
     }
     setErrors({});
@@ -134,6 +138,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         venue: formData.venue.trim(),
         capacity: Number(formData.capacity),
         imageUrl: formData.imageUrl.trim() || undefined,
+        category: formData.category,
       };
 
       let res;
@@ -217,6 +222,43 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               />
             </div>
             {errors.title && <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.title}</p>}
+          </div>
+
+          {/* Section / Category Selector (Cultural, Technical, Sports) */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Event Section / Arena Category <span className="text-rose-500">*</span>
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { id: 'Cultural', label: 'Cultural', icon: '🎭', desc: 'Dance, Music, Fashion' },
+                { id: 'Technical', label: 'Technical', icon: '💻', desc: 'Coding, Hackathons, AI' },
+                { id: 'Sports', label: 'Sports', icon: '🏆', desc: 'Athletics, Tournaments' },
+              ].map((cat) => (
+                <button
+                  type="button"
+                  key={cat.id}
+                  onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
+                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                    formData.category === cat.id
+                      ? 'border-slate-950 bg-slate-950 text-white shadow-md'
+                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-xs sm:text-sm">
+                    <span>{cat.icon}</span>
+                    <span>{cat.label}</span>
+                  </div>
+                  <span
+                    className={`text-[10px] block mt-0.5 line-clamp-1 ${
+                      formData.category === cat.id ? 'text-slate-300' : 'text-slate-400'
+                    }`}
+                  >
+                    {cat.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* 2-Column: Date & Time and Venue */}

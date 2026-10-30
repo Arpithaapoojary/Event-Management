@@ -22,8 +22,10 @@ import {
   ShieldCheck,
   ArrowLeft,
   Layers,
-  BarChart3,
   TrendingUp,
+  Cpu,
+  Trophy,
+  Palette,
 } from 'lucide-react';
 import api from '../../api/client';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -34,7 +36,7 @@ import EventRegistrationsModal from '../../components/admin/EventRegistrationsMo
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
 
-  // Active Dashboard Tab: 'events' | 'registrations' | 'analytics'
+  // Active Dashboard Tab: 'events' | 'registrations'
   const [activeTab, setActiveTab] = useState('events');
 
   // Stats
@@ -44,15 +46,21 @@ export default function AdminDashboardPage() {
     upcomingEvents: 0,
     pastEvents: 0,
     fullEvents: 0,
+    categories: {
+      cultural: 0,
+      technical: 0,
+      sports: 0,
+    },
   });
 
-  // Events list & filter
+  // Events list & filters
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [eventSearch, setEventSearch] = useState('');
   const [eventStatusFilter, setEventStatusFilter] = useState('all');
+  const [eventCategoryFilter, setEventCategoryFilter] = useState('all');
 
-  // All Registrations list & filter
+  // All Registrations list & filters
   const [registrations, setRegistrations] = useState([]);
   const [regLoading, setRegLoading] = useState(false);
   const [regSearch, setRegSearch] = useState('');
@@ -197,8 +205,19 @@ export default function AdminDashboardPage() {
     setRosterModalOpen(true);
   };
 
-  // Filtered Events
+  // Category counts
+  const culturalCount = events.filter((e) => (e.category || '').toLowerCase() === 'cultural').length;
+  const technicalCount = events.filter((e) => (e.category || '').toLowerCase() === 'technical').length;
+  const sportsCount = events.filter((e) => (e.category || '').toLowerCase() === 'sports').length;
+
+  // Filtered Events with Category & Status filters
   const filteredEvents = events.filter((ev) => {
+    // Category filter
+    if (eventCategoryFilter !== 'all') {
+      const cat = (ev.category || 'Cultural').toLowerCase();
+      if (cat !== eventCategoryFilter.toLowerCase()) return false;
+    }
+
     // Status filter
     if (eventStatusFilter === 'upcoming' && ev.status === 'PAST') return false;
     if (eventStatusFilter === 'open' && ev.status !== 'UPCOMING') return false;
@@ -210,12 +229,13 @@ export default function AdminDashboardPage() {
       const q = eventSearch.toLowerCase();
       const matchTitle = ev.title?.toLowerCase().includes(q);
       const matchVenue = ev.venue?.toLowerCase().includes(q);
-      return matchTitle || matchVenue;
+      const matchCat = ev.category?.toLowerCase().includes(q);
+      return matchTitle || matchVenue || matchCat;
     }
     return true;
   });
 
-  // Export Master Roster to CSV
+  // Export Master Roster to CSV with Category Column
   const exportMasterCSV = () => {
     const listToExport = registrations.length > 0 ? registrations : [];
     if (!listToExport.length) {
@@ -229,6 +249,7 @@ export default function AdminDashboardPage() {
       'Email Address',
       'Mobile Number (India)',
       'Event Name',
+      'Arena Section / Category',
       'Campus Venue',
       'Registration Date',
       'Ticket Code',
@@ -240,6 +261,7 @@ export default function AdminDashboardPage() {
       `"${r.email || ''}"`,
       `"+91 ${r.contactNumber || ''}"`,
       `"${r.event?.title || 'Event'}"`,
+      `"${r.event?.category || 'Cultural'}"`,
       `"${r.event?.venue || ''}"`,
       `"${new Date(r.createdAt).toLocaleString()}"`,
       `"#REG-${r._id ? r._id.slice(-6).toUpperCase() : 'PASS'}"`,
@@ -261,6 +283,33 @@ export default function AdminDashboardPage() {
   const overallUtilization = totalCapacity > 0
     ? Math.round((stats.totalRegistrations / totalCapacity) * 100)
     : 0;
+
+  // Helper for Category badge rendering
+  const renderCategoryBadge = (category) => {
+    const cat = category || 'Cultural';
+    if (cat === 'Technical') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-800 border border-sky-200">
+          <span>💻</span>
+          <span>Technical</span>
+        </span>
+      );
+    }
+    if (cat === 'Sports') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span>🏆</span>
+          <span>Sports</span>
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+        <span>🎭</span>
+        <span>Cultural</span>
+      </span>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#EDF5FB] text-slate-900 pb-24 font-sans selection:bg-slate-200">
@@ -309,7 +358,7 @@ export default function AdminDashboardPage() {
         )}
 
         {/* ======================================================== */}
-        {/* ENTERPRISE CAMPUS CONSOLE HERO CARD (Same Platform Style) */}
+        {/* ENTERPRISE CAMPUS CONSOLE HERO CARD */}
         {/* ======================================================== */}
         <div className="bg-white rounded-[32px] sm:rounded-[36px] p-6 sm:p-10 shadow-xl border border-white/80 overflow-hidden mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -322,7 +371,7 @@ export default function AdminDashboardPage() {
                 Event Management Console
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-2xl leading-relaxed">
-                Publish campus events, manage student admission rosters, track seating capacity utilization, and inspect live registration activity.
+                Oversee cultural, technical, and sports event listings, monitor seating capacity utilization, manage student rosters, and publish upcoming campus activities.
               </p>
             </div>
 
@@ -351,7 +400,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* ======================================================== */}
-          {/* SUMMARY KPI METRIC CARDS */}
+          {/* SUMMARY KPI METRIC CARDS WITH SECTION BREAKDOWN */}
           {/* ======================================================== */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-slate-100">
             {/* 1. Total Published Events */}
@@ -372,11 +421,58 @@ export default function AdminDashboardPage() {
               </span>
             </div>
 
-            {/* 2. Total Student Registrations */}
+            {/* 2. Campus Arenas / Sections Breakdown */}
+            <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/70 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Arena Categories
+                </span>
+                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center">
+                  <Layers className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-semibold mt-1">
+                <span
+                  onClick={() => {
+                    setActiveTab('events');
+                    setEventCategoryFilter('Cultural');
+                  }}
+                  className="px-2 py-0.5 rounded-full bg-amber-100/80 text-amber-900 cursor-pointer hover:bg-amber-200 transition"
+                  title="Filter Cultural Events"
+                >
+                  🎭 {culturalCount}
+                </span>
+                <span
+                  onClick={() => {
+                    setActiveTab('events');
+                    setEventCategoryFilter('Technical');
+                  }}
+                  className="px-2 py-0.5 rounded-full bg-sky-100/80 text-sky-900 cursor-pointer hover:bg-sky-200 transition"
+                  title="Filter Technical Events"
+                >
+                  💻 {technicalCount}
+                </span>
+                <span
+                  onClick={() => {
+                    setActiveTab('events');
+                    setEventCategoryFilter('Sports');
+                  }}
+                  className="px-2 py-0.5 rounded-full bg-emerald-100/80 text-emerald-900 cursor-pointer hover:bg-emerald-200 transition"
+                  title="Filter Sports Events"
+                >
+                  🏆 {sportsCount}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400 mt-2 block">
+                Click category to filter
+              </span>
+            </div>
+
+            {/* 3. Total Student Registrations */}
             <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/70 shadow-2xs">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Total Registrations
+                  Student Passes
                 </span>
                 <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center">
                   <Users className="w-4 h-4" />
@@ -386,15 +482,15 @@ export default function AdminDashboardPage() {
                 {stats.totalRegistrations}
               </div>
               <span className="text-[11px] text-emerald-700 font-semibold mt-1 block">
-                ● Verified Student Passes
+                ● Active Student Registrations
               </span>
             </div>
 
-            {/* 3. Seating Capacity Utilization */}
+            {/* 4. Seating Capacity Utilization */}
             <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/70 shadow-2xs">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Campus Capacity Rate
+                  Campus Seating Filled
                 </span>
                 <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center">
                   <TrendingUp className="w-4 h-4" />
@@ -409,24 +505,6 @@ export default function AdminDashboardPage() {
                   style={{ width: `${overallUtilization}%` }}
                 />
               </div>
-            </div>
-
-            {/* 4. Events At Full Capacity */}
-            <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/70 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Fully Booked Events
-                </span>
-                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center">
-                  <UserCheck className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-slate-950">
-                {stats.fullEvents}
-              </div>
-              <span className="text-[11px] text-slate-500 mt-1 block">
-                {stats.fullEvents > 0 ? 'Waitlist or Closed' : 'All events have seats'}
-              </span>
             </div>
           </div>
         </div>
@@ -483,44 +561,79 @@ export default function AdminDashboardPage() {
         {/* ======================================================== */}
         {activeTab === 'events' && (
           <div className="space-y-4">
-            {/* Search & Filter Toolbar */}
-            <div className="bg-white p-4 rounded-3xl border border-white/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-80">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Search className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  value={eventSearch}
-                  onChange={(e) => setEventSearch(e.target.value)}
-                  placeholder="Search events by title or venue..."
-                  className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden focus:border-slate-950 focus:ring-4 focus:ring-slate-950/10 transition"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-                <span className="text-xs font-semibold text-slate-400 hidden sm:inline mr-1">
-                  Filter:
+            {/* Search & Category Filter Toolbar */}
+            <div className="bg-white p-4 sm:p-5 rounded-3xl border border-white/80 shadow-sm flex flex-col gap-4">
+              {/* Category Arena Tabs matching user side */}
+              <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-slate-100">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">
+                  Arena Section:
                 </span>
                 {[
-                  { key: 'all', label: 'All Events' },
-                  { key: 'upcoming', label: 'Upcoming' },
-                  { key: 'open', label: 'Open' },
-                  { key: 'full', label: 'Sold Out' },
-                  { key: 'past', label: 'Concluded' },
-                ].map(({ key, label }) => (
+                  { key: 'all', label: 'All Arenas', count: events.length },
+                  { key: 'Cultural', label: '🎭 Cultural Events', count: culturalCount },
+                  { key: 'Technical', label: '💻 Technical Events', count: technicalCount },
+                  { key: 'Sports', label: '🏆 Sports Events', count: sportsCount },
+                ].map(({ key, label, count }) => (
                   <button
                     key={key}
-                    onClick={() => setEventStatusFilter(key)}
-                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                      eventStatusFilter === key
+                    onClick={() => setEventCategoryFilter(key)}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                      eventCategoryFilter === key
                         ? 'bg-slate-950 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
-                    {label}
+                    <span>{label}</span>
+                    <span
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                        eventCategoryFilter === key ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {count}
+                    </span>
                   </button>
                 ))}
+              </div>
+
+              {/* Status & Search row */}
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="relative w-full md:w-80">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Search className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={eventSearch}
+                    onChange={(e) => setEventSearch(e.target.value)}
+                    placeholder="Search by title, venue, or category..."
+                    className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden focus:border-slate-950 focus:ring-4 focus:ring-slate-950/10 transition"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                  <span className="text-xs font-semibold text-slate-400 hidden sm:inline mr-1">
+                    Status:
+                  </span>
+                  {[
+                    { key: 'all', label: 'All Status' },
+                    { key: 'upcoming', label: 'Upcoming' },
+                    { key: 'open', label: 'Registration Open' },
+                    { key: 'full', label: 'Sold Out' },
+                    { key: 'past', label: 'Concluded' },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setEventStatusFilter(key)}
+                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                        eventStatusFilter === key
+                          ? 'bg-slate-950 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -536,7 +649,7 @@ export default function AdminDashboardPage() {
                   <Calendar className="w-12 h-12 mx-auto text-slate-300 mb-2" />
                   <p className="text-sm font-bold text-slate-700">No Events Found</p>
                   <p className="text-xs text-slate-400 mt-1">
-                    Try adjusting your search criteria or publish a new event.
+                    Try adjusting your search criteria or arena category filter.
                   </p>
                 </div>
               ) : (
@@ -545,9 +658,10 @@ export default function AdminDashboardPage() {
                     <thead>
                       <tr className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200/80">
                         <th className="py-4 px-6">Event Details</th>
+                        <th className="py-4 px-4">Arena Section</th>
                         <th className="py-4 px-4">Date &amp; Time</th>
-                        <th className="py-4 px-4">Venue</th>
-                        <th className="py-4 px-4">Seating Capacity</th>
+                        <th className="py-4 px-4">Campus Venue</th>
+                        <th className="py-4 px-4">Attendance</th>
                         <th className="py-4 px-4">Status</th>
                         <th className="py-4 px-6 text-right">Actions</th>
                       </tr>
@@ -598,6 +712,11 @@ export default function AdminDashboardPage() {
                               </div>
                             </td>
 
+                            {/* Arena Category */}
+                            <td className="py-4 px-4 whitespace-nowrap">
+                              {renderCategoryBadge(ev.category)}
+                            </td>
+
                             {/* Date */}
                             <td className="py-4 px-4 whitespace-nowrap text-slate-700 text-xs font-medium">
                               <span className="flex items-center gap-1.5">
@@ -614,7 +733,7 @@ export default function AdminDashboardPage() {
                               </span>
                             </td>
 
-                            {/* Seating Progress */}
+                            {/* Attendance / Capacity */}
                             <td className="py-4 px-4 whitespace-nowrap">
                               <div className="w-36">
                                 <div className="flex justify-between text-[11px] font-bold text-slate-800 mb-1">
@@ -679,7 +798,7 @@ export default function AdminDashboardPage() {
         )}
 
         {/* ======================================================== */}
-        {/* TAB 2: STUDENT ATTENDEE ROSTERS (Module 5) */}
+        {/* TAB 2: STUDENT ATTENDEE ROSTERS */}
         {/* ======================================================== */}
         {activeTab === 'registrations' && (
           <div className="space-y-4">
@@ -707,10 +826,10 @@ export default function AdminDashboardPage() {
                   onChange={(e) => setSelectedEventId(e.target.value)}
                   className="w-full sm:w-64 px-4 py-2.5 text-xs sm:text-sm rounded-full border border-slate-200 bg-white focus:outline-hidden focus:border-slate-950 text-slate-800 font-medium"
                 >
-                  <option value="">All Events ({events.length})</option>
+                  <option value="">All Campus Events ({events.length})</option>
                   {events.map((ev) => (
                     <option key={ev._id} value={ev._id}>
-                      {ev.title} ({ev.registeredCount || 0} registered)
+                      [{ev.category || 'Event'}] {ev.title} ({ev.registeredCount || 0} registered)
                     </option>
                   ))}
                 </select>
@@ -734,7 +853,7 @@ export default function AdminDashboardPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-800 shadow-2xs hover:shadow-xs transition active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Export Roster CSV</span>
+                    <span>Export Master CSV</span>
                   </button>
                 )}
               </div>
@@ -763,6 +882,7 @@ export default function AdminDashboardPage() {
                         <th className="py-4 px-6">Student Attendee</th>
                         <th className="py-4 px-4">Contact Details</th>
                         <th className="py-4 px-4">Associated Event</th>
+                        <th className="py-4 px-4">Section</th>
                         <th className="py-4 px-4">Registration Date</th>
                         <th className="py-4 px-4">Ticket ID</th>
                         <th className="py-4 px-6 text-right">Status</th>
@@ -807,6 +927,11 @@ export default function AdminDashboardPage() {
                               ) : (
                                 <span className="text-slate-400 italic">Archived Event</span>
                               )}
+                            </td>
+
+                            {/* Section Category */}
+                            <td className="py-4 px-4 whitespace-nowrap">
+                              {renderCategoryBadge(reg.event?.category)}
                             </td>
 
                             {/* Date */}

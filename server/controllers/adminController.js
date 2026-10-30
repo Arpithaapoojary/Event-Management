@@ -35,6 +35,9 @@ exports.getAdminStats = async (req, res, next) => {
       upcomingEvents,
       pastEvents,
       fullEvents,
+      culturalEvents,
+      technicalEvents,
+      sportsEvents,
     ] = await Promise.all([
       Event.countDocuments({ isDeleted: false }),
       Registration.countDocuments(),
@@ -44,6 +47,9 @@ exports.getAdminStats = async (req, res, next) => {
         isDeleted: false,
         $expr: { $gte: ['$registeredCount', '$capacity'] },
       }),
+      Event.countDocuments({ isDeleted: false, category: 'Cultural' }),
+      Event.countDocuments({ isDeleted: false, category: 'Technical' }),
+      Event.countDocuments({ isDeleted: false, category: 'Sports' }),
     ]);
 
     res.status(200).json({
@@ -54,6 +60,11 @@ exports.getAdminStats = async (req, res, next) => {
         upcomingEvents,
         pastEvents,
         fullEvents,
+        categories: {
+          cultural: culturalEvents,
+          technical: technicalEvents,
+          sports: sportsEvents,
+        },
       },
     });
   } catch (error) {
@@ -66,7 +77,7 @@ exports.getAdminStats = async (req, res, next) => {
 // @access  Private (Admin)
 exports.createEvent = async (req, res, next) => {
   try {
-    const { title, description, dateTime, venue, capacity, imageUrl } = req.body;
+    const { title, description, dateTime, venue, capacity, imageUrl, category } = req.body;
 
     // Field validations
     if (!title || !description || !dateTime || !venue || capacity === undefined) {
@@ -97,6 +108,7 @@ exports.createEvent = async (req, res, next) => {
       dateTime: eventDate,
       venue: venue.trim(),
       capacity: Number(capacity),
+      category: category && ['Cultural', 'Technical', 'Sports', 'Other'].includes(category) ? category : 'Cultural',
       imageUrl:
         imageUrl && imageUrl.trim() !== ''
           ? imageUrl.trim()
@@ -118,7 +130,7 @@ exports.createEvent = async (req, res, next) => {
 // @access  Private (Admin)
 exports.updateEvent = async (req, res, next) => {
   try {
-    const { title, description, dateTime, venue, capacity, imageUrl } = req.body;
+    const { title, description, dateTime, venue, capacity, imageUrl, category } = req.body;
     const event = await Event.findOne({ _id: req.params.id, isDeleted: false });
 
     if (!event) {
@@ -159,6 +171,9 @@ exports.updateEvent = async (req, res, next) => {
       event.dateTime = eventDate;
     }
     if (venue) event.venue = venue.trim();
+    if (category && ['Cultural', 'Technical', 'Sports', 'Other'].includes(category)) {
+      event.category = category;
+    }
     if (imageUrl !== undefined) {
       event.imageUrl = imageUrl.trim() !== '' ? imageUrl.trim() : event.imageUrl;
     }

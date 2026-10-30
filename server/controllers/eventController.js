@@ -6,11 +6,16 @@ const Registration = require('../models/Registration');
 // @access  Public
 exports.getEvents = async (req, res, next) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, category } = req.query;
     const now = new Date();
 
     // Base query: exclude soft-deleted events
     let query = { isDeleted: false };
+
+    // Filter by category if specified
+    if (category && category.toLowerCase() !== 'all') {
+      query.category = new RegExp(`^${category}$`, 'i');
+    }
 
     // Search by title, description, or venue
     if (search && search.trim() !== '') {
