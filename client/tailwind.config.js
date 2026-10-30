@@ -8,8 +8,9 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
         serif: ['Playfair Display', 'Cinzel', 'Georgia', 'serif'],
-        display: ['Cinzel', 'Playfair Display', 'serif'],
       },
       colors: {
         maroon: {

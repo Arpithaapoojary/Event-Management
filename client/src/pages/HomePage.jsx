@@ -9,6 +9,7 @@ import {
   Music,
   Cpu,
   Trophy,
+  MapPin,
   CheckCircle2,
   Users
 } from 'lucide-react';
@@ -19,62 +20,53 @@ const CATEGORY_CARDS = [
   {
     id: 'cultural',
     title: 'Cultural Events',
-    badgeText: 'Indian Heritage & Arts',
+    categoryName: 'Classical Dance • Music • Drama',
+    badgeText: 'Open to All',
     icon: Music,
-    badgeColor: 'bg-amber-500/25 text-amber-200 border-amber-400/40',
-    hoverBorder: 'hover:border-amber-400/80 hover:shadow-amber-500/15',
-    buttonColor: 'bg-amber-400/20 hover:bg-amber-400 text-amber-200 hover:text-slate-950 border-amber-400/40 group-hover:border-amber-300',
-    glowColor: 'group-hover:bg-amber-500/10',
-    accentText: 'text-amber-300',
-    tagline: 'Dance • Music • Fashion • Drama',
+    tagline: 'Dance • Music • Fashion',
     description:
-      'Immerse in India’s vibrant performing arts, classical Bharatanatyam rhythms, live musical fusions, ethnic couture fashion walks, and grand college fest celebrations.',
-    tags: ['Traditional Dance', 'Music & Vocals', 'Fashion Walk', 'Fest'],
-    image:
-      'https://images.unsplash.com/photo-1598387993441-a364f854c3e1?auto=format&fit=crop&w=1200&q=80',
+      'Immerse in classical Bharatanatyam rhythms, live musical band fusions, theatrical plays, and ethnic couture fashion walks on the grand campus stage.',
+    plateColor: 'bg-[#FBA58F]', // Coral/Peach plate matching pattern
+    gradientClass: 'from-[#FDE047]/60 via-[#FEF08A]/25 to-transparent', // Yellow gradient matching screenshot
+    venue: 'Grand Campus Auditorium',
+    image: '/images/cultural_events.jpg',
     searchKeyword: 'cultural',
     filterKeywords: ['dance', 'music', 'singing', 'fashion', 'theatre', 'drama', 'cultural', 'fest'],
-    delayClass: 'animation-delay-300',
+    delayClass: 'animation-delay-100',
   },
   {
     id: 'technical',
     title: 'Technical Events',
-    badgeText: 'Innovation & Engineering',
+    categoryName: 'Hackathons • Coding • Robotics',
+    badgeText: 'Open to All',
     icon: Cpu,
-    badgeColor: 'bg-indigo-500/25 text-indigo-200 border-indigo-400/40',
-    hoverBorder: 'hover:border-indigo-400/80 hover:shadow-indigo-500/15',
-    buttonColor: 'bg-indigo-400/20 hover:bg-indigo-500 text-indigo-200 hover:text-white border-indigo-400/40 group-hover:border-indigo-300',
-    glowColor: 'group-hover:bg-indigo-500/10',
-    accentText: 'text-indigo-300',
-    tagline: 'Hackathons • Coding • Robotics • Expos',
+    tagline: 'Hackathons • Coding • Robotics',
     description:
-      'Push the frontiers of engineering across 24-hour collaborative hackathons, competitive algorithm sprints, autonomous robotics arenas, and tech workshops.',
-    tags: ['24h Hackathons', 'Coding Sprints', 'Robotics Arena', 'Tech Expos'],
-    image:
-      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+      'Push your engineering boundaries in 24-hour collaborative hackathons, competitive algorithm sprints, autonomous robotics arenas, and hands-on workshops.',
+    plateColor: 'bg-[#00E5FF]', // Vivid cyan plate matching screenshot
+    gradientClass: 'from-[#FDA4AF]/60 via-[#FFE4E6]/25 to-transparent', // Pink gradient matching screenshot
+    venue: 'Tech Park Innovation Labs',
+    image: '/images/technical_events.jpg',
     searchKeyword: 'technical',
     filterKeywords: ['hackathon', 'coding', 'robotics', 'workshop', 'project', 'technical', 'tech', 'engineering'],
-    delayClass: 'animation-delay-400',
+    delayClass: 'animation-delay-200',
   },
   {
     id: 'sports',
     title: 'Sports Events',
-    badgeText: 'Athletics & Championships',
+    categoryName: 'Football • Cricket • Athletics',
+    badgeText: 'Open to All',
     icon: Trophy,
-    badgeColor: 'bg-emerald-500/25 text-emerald-200 border-emerald-400/40',
-    hoverBorder: 'hover:border-emerald-400/80 hover:shadow-emerald-500/15',
-    buttonColor: 'bg-emerald-400/20 hover:bg-emerald-500 text-emerald-200 hover:text-slate-950 border-emerald-400/40 group-hover:border-emerald-300',
-    glowColor: 'group-hover:bg-emerald-500/10',
-    accentText: 'text-emerald-300',
-    tagline: 'Cricket • Football • Volleyball • Athletics',
+    tagline: 'Cricket • Football • Athletics',
     description:
-      'Compete with passion and teamwork in campus cricket tournaments, football leagues, volleyball championships, and high-energy track & field athletics.',
-    tags: ['Cricket League', 'Football League', 'Volleyball', 'Athletics'],
-    image:
-      'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=1200&q=80',
+      'Compete with teamwork, stamina, and passion across inter-college cricket leagues, football tournaments, volleyball matches, and outdoor track athletics.',
+    plateColor: 'bg-[#F5B800]', // Golden amber plate matching screenshot
+    gradientClass: 'from-[#FDBA74]/60 via-[#FFEDD5]/25 to-transparent', // Warm apricot gradient matching screenshot
+    venue: 'University Sports Complex',
+    image: '/images/sports_events.jpg',
     searchKeyword: 'sports',
     filterKeywords: ['cricket', 'football', 'volleyball', 'athletics', 'sports', 'game', 'tournament', 'indoor'],
-    delayClass: 'animation-delay-500',
+    delayClass: 'animation-delay-300',
   },
 ];
 
@@ -86,7 +78,6 @@ export default function HomePage() {
   // Search and Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'upcoming' | 'open' | 'past'
-
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState(null);
 
   const fetchEvents = async () => {
@@ -161,341 +152,267 @@ export default function HomePage() {
     return true;
   });
 
-  const upcomingCount = events.filter((e) => e.status === 'UPCOMING').length;
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 selection:bg-indigo-500/20 selection:text-indigo-900">
-      {/* 1. CREATIVE, PREMIUM & PROFESSIONAL COLLEGE EVENT LANDING HERO */}
-      <section className="relative overflow-hidden bg-slate-950 text-white pt-12 sm:pt-16 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        {/* Ambient atmospheric lighting accents */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[550px] h-[350px] bg-indigo-600/10 rounded-full blur-[120px]" />
-          <div className="absolute top-1/3 right-10 w-[500px] h-[400px] bg-amber-500/10 rounded-full blur-[140px]" />
-          <div className="absolute bottom-10 left-1/3 w-[500px] h-[350px] bg-emerald-500/10 rounded-full blur-[120px]" />
-          {/* Subtle grid texture */}
-          <div
-            className="absolute inset-0 opacity-[0.035]"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
-              backgroundSize: '28px 28px',
-            }}
-          />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto">
-          {/* Hero Header & Editorial Intro */}
-          <div className="text-center max-w-4xl mx-auto mb-14 sm:mb-16">
-            {/* Eyebrow Kicker with subtle entrance animation */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-amber-300 text-xs sm:text-sm font-semibold mb-6 shadow-sm animate-hero-fade-up">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-white/95 uppercase tracking-wider text-[11px] sm:text-xs font-bold">
-                Annual Campus Fest &amp; Event Confluence • 2026
+    <div className="min-h-screen bg-[#EDF5FB] text-slate-900 pb-20 selection:bg-slate-200 selection:text-slate-900">
+      {/* ======================================================== */}
+      {/* 1. HERO SECTION WITH EVENT LINEUP & SIGNATURE 3 CARDS */}
+      {/* ======================================================== */}
+      <section className="relative pt-10 sm:pt-14 pb-14 sm:pb-18 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header - Exact matching layout from user's reference */}
+          <div className="mb-10 sm:mb-12">
+            {/* Super-Kicker */}
+            <div className="mb-3">
+              <span className="text-xs font-black tracking-[0.25em] uppercase text-slate-500 font-display">
+                EXPLORE • ANNUAL CAMPUS EVENT 2026
               </span>
-              <span className="text-white/30">•</span>
-              <span className="text-amber-200 text-xs font-medium">Cultural • Technical • Sports</span>
             </div>
 
-            {/* Main Editorial Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] mb-6 font-sans animate-hero-fade-up animation-delay-100">
-              Where Talent Meets{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-100 to-white">
-                Tradition
-              </span>
-              <span className="text-indigo-400">.</span>
+            {/* Bold Display Headline: Event Lineup */}
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-none mb-4">
+              Event Lineup
             </h1>
 
-            {/* Meaningful Description about Cultural, Technical and Sports Events */}
-            <p className="text-slate-200 text-base sm:text-lg lg:text-xl leading-relaxed max-w-3xl mx-auto mb-8 animate-hero-fade-up animation-delay-200 font-normal">
-              Celebrate the vibrant spirit of collegiate excellence. Discover spellbinding cultural arts and traditional performances, compete in 24-hour technical hackathons, and rally behind champions across competitive sports arenas.
+            {/* Authentic Human Description */}
+            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
+              Step into the arena of creativity, skill, and performance as the campus comes alive with unforgettable events across cultural, technical, and sports arenas.
             </p>
-
-            {/* Two Action CTA Buttons with subtle entrance animation */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-10 animate-hero-fade-up animation-delay-300">
-              <button
-                onClick={() => scrollToSection('events-directory')}
-                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-slate-950 bg-white hover:bg-amber-100 shadow-lg shadow-black/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 inline-flex items-center gap-2.5 group cursor-pointer"
-              >
-                <span>Explore Events</span>
-                <ArrowRight className="w-4 h-4 text-slate-900 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab('open');
-                  scrollToSection('events-directory');
-                }}
-                className="px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base text-white bg-white/10 hover:bg-white/20 border border-white/25 backdrop-blur-md shadow-sm hover:border-white/40 hover:-translate-y-0.5 transition-all duration-200 inline-flex items-center gap-2.5 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Register Now</span>
-              </button>
-            </div>
-
-            {/* Integrated Sleek Search Bar */}
-            <div className="max-w-2xl mx-auto animate-hero-fade-up animation-delay-400">
-              <div className="relative rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1.5 shadow-2xl focus-within:bg-white/15 focus-within:border-white/45 transition-all">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-300">
-                  <Search className="w-5 h-5" />
-                </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSelectedCategoryFilter(null);
-                  }}
-                  placeholder="Search cultural fests, hackathons, robotics, sports tournaments..."
-                  className="w-full pl-11 pr-20 py-3 bg-transparent rounded-xl text-white placeholder-slate-300 text-sm sm:text-base focus:outline-none"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={handleClearFilter}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Quick Filter Pills matching the 3 main categories */}
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs">
-                <span className="text-slate-400 font-medium">Quick search:</span>
-                {[
-                  { label: 'Cultural Events', q: 'cultural' },
-                  { label: 'Technical Events', q: 'technical' },
-                  { label: 'Sports Events', q: 'sports' },
-                  { label: 'Hackathons', q: 'hackathon' },
-                  { label: 'Dance', q: 'dance' },
-                ].map((pill) => (
-                  <button
-                    key={pill.label}
-                    onClick={() => handleSelectCategory(pill.q)}
-                    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/15 transition-all cursor-pointer hover:border-white/30"
-                  >
-                    {pill.label}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* ======================================================== */}
-          {/* THE 3-CARD VISUAL COMPOSITION (Cultural, Technical, Sports) */}
+          {/* THE 3-CARD COMPOSITION (Exact Card Design from reference) */}
           {/* ======================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-            {CATEGORY_CARDS.map((cat) => {
-              const IconComponent = cat.icon;
-              return (
+            {CATEGORY_CARDS.map((cat) => (
+              <div
+                key={cat.id}
+                className="relative bg-white rounded-[32px] p-5 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/70 flex flex-col justify-between overflow-hidden group"
+              >
+                {/* Smooth Bottom Gradient matching reference */}
                 <div
-                  key={cat.id}
-                  onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
-                  className={`group relative rounded-2xl lg:rounded-3xl overflow-hidden border border-white/15 bg-slate-900 shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer flex flex-col justify-between p-6 sm:p-7 min-h-[480px] sm:min-h-[500px] lg:min-h-[520px] animate-hero-fade-up ${cat.delayClass} ${cat.hoverBorder}`}
-                >
-                  {/* Large High-Quality Realistic Photograph */}
+                  className={`absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[32px]`}
+                />
+
+                {/* Upper Visual Container with Rounded Colored Plate */}
+                <div className="relative w-full h-64 sm:h-72 flex items-center justify-center overflow-visible mb-4">
+                  {/* Colored Backdrop Block (Peach / Cyan / Amber) - inset so character pops out */}
+                  <div
+                    className={`absolute inset-x-4 top-3 bottom-4 rounded-3xl ${cat.plateColor} shadow-inner transition-transform duration-500 group-hover:scale-95`}
+                  />
+
+                  {/* Character / Subject Illustration popping over the colored plate */}
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="absolute inset-0 w-full h-full object-cover object-center transform scale-100 group-hover:scale-108 transition-transform duration-700 ease-out filter brightness-90 group-hover:brightness-95"
-                    referrerPolicy="no-referrer"
+                    className="relative z-10 max-h-64 sm:max-h-72 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-sm"
+                    loading="lazy"
                   />
+                </div>
 
-                  {/* Sophisticated Dark Vignette Overlay for Readability */}
-                  <div className="absolute inset-0 bg-slate-950/40 group-hover:bg-slate-950/30 transition-colors duration-500 pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 via-50% to-transparent pointer-events-none" />
-                  <div className={`absolute inset-0 transition-colors duration-500 pointer-events-none ${cat.glowColor}`} />
+                {/* Card Content & Action Bar */}
+                <div className="relative z-10 text-center flex flex-col items-center">
+                  {/* Bright Golden-Yellow Pill Badge */}
+                  <span className="bg-[#FFC700] text-slate-950 font-black text-xs px-4 py-1.5 rounded-full inline-block mb-2.5 shadow-xs uppercase tracking-wider">
+                    {cat.badgeText}
+                  </span>
 
-                  {/* Card Top: Category Badge & Live Arena Indicator */}
-                  <div className="relative z-10 flex items-center justify-between gap-2">
-                    <div
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border shadow-sm ${cat.badgeColor}`}
+                  {/* Bold Display Card Title */}
+                  <h3 className="text-2xl sm:text-[26px] font-black font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
+                    {cat.title}
+                  </h3>
+
+                  {/* Subtitle / Category info */}
+                  <p className="text-xs font-bold text-slate-600 mb-5 tracking-wide">
+                    {cat.categoryName}
+                  </p>
+
+                  {/* Bottom Action Bar: Black Pill + Black Circle Pin */}
+                  <div className="w-full flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
+                      className="flex-1 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-black text-white font-extrabold text-sm tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer text-center"
                     >
-                      <IconComponent className="w-3.5 h-3.5" />
-                      <span>{cat.badgeText}</span>
-                    </div>
-                    <span className="text-[11px] font-bold text-white/80 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                      Flagship Arena
-                    </span>
-                  </div>
+                      View Details
+                    </button>
 
-                  {/* Card Bottom: Content & CTA Button */}
-                  <div className="relative z-10 mt-auto pt-16">
-                    <div className={`text-[11px] font-bold tracking-wider uppercase mb-1.5 ${cat.accentText}`}>
-                      {cat.tagline}
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2.5 group-hover:text-white transition-colors">
-                      {cat.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mb-4 line-clamp-3">
-                      {cat.description}
-                    </p>
-
-                    {/* Quick Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                      {cat.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-white/10 backdrop-blur-md text-white/90 border border-white/10"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Interactive Button */}
-                    <div
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-between border backdrop-blur-md transition-all duration-300 ${cat.buttonColor}`}
+                    <button
+                      type="button"
+                      onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
+                      title={`Venue: ${cat.venue}`}
+                      className="w-12 h-12 rounded-full bg-slate-950 hover:bg-black text-white flex items-center justify-center shrink-0 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
                     >
-                      <span>Explore {cat.title}</span>
-                      <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
-                    </div>
+                      <MapPin className="w-5 h-5 text-white" />
+                    </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Quick Institutional Highlights Strip below the 3 Cards */}
-          <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center text-xs text-slate-300">
-            <div className="flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Instant Digital Registration &amp; QR Passes</span>
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <Users className="w-4 h-4 text-amber-400" />
-              <span>Inter-College Competitions &amp; Open Participation</span>
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
-              <span>Certified Awards &amp; Cash Prizes</span>
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 3. MAIN EVENTS DIRECTORY */}
-      <main id="events-directory" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
+      {/* ======================================================== */}
+      {/* 2. MAIN EVENTS DIRECTORY (SUB-EVENTS) */}
+      {/* ======================================================== */}
+      <main id="events-directory" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
+        {/* Section Header matching main event section typography */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            {/* Super-Kicker */}
+            <div className="mb-3">
+              <span className="text-xs font-black tracking-[0.25em] uppercase text-slate-500 font-display">
+                ALL SUB-EVENTS • 2026 CAMPUS SCHEDULE
+              </span>
+            </div>
+
+            {/* Display Headline */}
+            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-none mb-4">
               Live &amp; Upcoming Events
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Browse official schedules, technical contests, and reserve your seat instantly.
+
+            {/* Description */}
+            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
+              Browse individual schedules, competitions, and reserve your registration pass.
             </p>
           </div>
 
-          <div className="text-xs sm:text-sm font-medium text-slate-500">
-            Showing <strong className="text-slate-800">{filteredEvents.length}</strong> of{' '}
-            <strong className="text-slate-800">{events.length}</strong> registered events
+          <div className="flex items-center gap-2 self-start md:self-end">
+            <span className="px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-2xs text-xs sm:text-sm font-bold text-slate-700">
+              Showing <strong className="text-slate-950">{filteredEvents.length}</strong> of{' '}
+              <strong className="text-slate-950">{events.length}</strong> total events
+            </span>
           </div>
         </div>
 
-        {/* Filter Navigation Tabs */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl overflow-x-auto max-w-full">
-            {[
-              { id: 'all', label: 'All Events', count: events.length },
-              { id: 'upcoming', label: 'Upcoming', count: events.filter((e) => e.status !== 'PAST').length },
-              { id: 'open', label: 'Open for Registration', count: upcomingCount },
-              { id: 'past', label: 'Past Events', count: events.filter((e) => e.status === 'PAST').length },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  activeTab === tab.id
-                    ? 'bg-white text-indigo-600 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`text-[11px] px-1.5 py-0.5 rounded-full ${
-                    activeTab === tab.id
-                      ? 'bg-indigo-50 text-indigo-600 font-bold'
-                      : 'bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  {tab.count}
+        {/* Selected Category Filter Banner (if user filtered via category card) */}
+        {selectedCategoryFilter && (
+          <div className="mb-8 p-4 rounded-3xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs animate-hero-fade-in">
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-sm font-bold text-slate-900">
+                Filtered by category:{' '}
+                <span className="font-extrabold capitalize text-slate-950">
+                  {selectedCategoryFilter.keyword} Events
                 </span>
-              </button>
-            ))}
-          </div>
-
-          {searchQuery && (
-            <div className="flex items-center gap-2 text-xs text-slate-700 bg-indigo-50/70 border border-indigo-100 px-3 py-1.5 rounded-lg">
-              <span>Filtered by: <strong>"{searchQuery}"</strong></span>
-              <button
-                onClick={handleClearFilter}
-                className="text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
-              >
-                Clear
-              </button>
+              </span>
             </div>
-          )}
-        </div>
-
-        {/* Loading State */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-slate-200 p-4 animate-pulse space-y-4"
-              >
-                <div className="aspect-[16/9] bg-slate-200 rounded-xl" />
-                <div className="h-4 bg-slate-200 rounded w-1/3" />
-                <div className="h-6 bg-slate-200 rounded w-3/4" />
-                <div className="h-4 bg-slate-200 rounded w-full" />
-                <div className="h-10 bg-slate-200 rounded-xl" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error State */}
-        {!loading && error && (
-          <div className="max-w-md mx-auto my-12 bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center shadow-xs">
-            <AlertCircle className="w-10 h-10 text-rose-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-rose-900 mb-1">Failed to Connect to Server</h3>
-            <p className="text-xs text-rose-700 mb-4">{error}</p>
             <button
-              onClick={fetchEvents}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition cursor-pointer"
+              onClick={handleClearFilter}
+              className="text-xs font-extrabold text-slate-700 hover:text-slate-950 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Retry</span>
+              Clear Filter ✕
             </button>
           </div>
         )}
 
-        {/* Empty State */}
-        {!loading && !error && filteredEvents.length === 0 && (
-          <div className="max-w-md mx-auto my-16 text-center bg-white rounded-2xl border border-slate-200 p-8 shadow-xs">
-            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">No Events Found</h3>
-            <p className="text-sm text-slate-500 mb-6">
-              {searchQuery
-                ? `No events matched your search "${searchQuery}". Try different keywords.`
-                : 'There are no events listed under this category right now.'}
-            </p>
+        {/* Tabs and Quick Search Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between mb-10">
+          {/* Status Tabs */}
+          <div className="flex items-center gap-1 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto shrink-0 max-w-full">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'all'
+                  ? 'bg-slate-950 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              All Events
+            </button>
+            <button
+              onClick={() => setActiveTab('upcoming')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'upcoming'
+                  ? 'bg-slate-950 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              Upcoming
+            </button>
+            <button
+              onClick={() => setActiveTab('open')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'open'
+                  ? 'bg-slate-950 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              Registration Open
+            </button>
+            <button
+              onClick={() => setActiveTab('past')}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'past'
+                  ? 'bg-slate-950 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              Past
+            </button>
+          </div>
+
+          {/* Search Input Box */}
+          <div className="relative w-full lg:w-80 shrink-0">
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by event, title, venue..."
+              className="w-full pl-11 pr-10 py-2.5 rounded-full bg-white border border-slate-200/90 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-slate-950 text-slate-900 shadow-2xs placeholder-slate-400"
+            />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition cursor-pointer"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
               >
-                Clear Search
+                ✕
               </button>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Event Cards Grid */}
-        {!loading && !error && filteredEvents.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* ======================================================== */}
+        {/* EVENT CARDS GRID */}
+        {/* ======================================================== */}
+        {loading ? (
+          <div className="py-24 text-center flex flex-col items-center justify-center">
+            <RefreshCw className="w-8 h-8 text-slate-600 animate-spin mb-4" />
+            <p className="text-slate-700 font-semibold text-sm">Loading campus events...</p>
+          </div>
+        ) : error ? (
+          <div className="py-16 px-6 max-w-md mx-auto text-center bg-white rounded-3xl border border-rose-200 shadow-sm">
+            <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-slate-900 mb-1">Failed to Load Events</h3>
+            <p className="text-xs text-slate-600 mb-4">{error}</p>
+            <button
+              onClick={fetchEvents}
+              className="px-5 py-2.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all cursor-pointer shadow-xs"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div className="py-20 text-center bg-white rounded-3xl border border-slate-200/80 p-8 shadow-xs">
+            <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-slate-900 mb-1">No Events Found</h3>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-5">
+              {searchQuery
+                ? `No events matching "${searchQuery}". Try clearing search filters.`
+                : 'No events currently registered in this tab.'}
+            </p>
+            {(searchQuery || selectedCategoryFilter) && (
+              <button
+                onClick={handleClearFilter}
+                className="px-5 py-2.5 rounded-full bg-slate-950 text-white text-xs font-bold hover:bg-black transition-all cursor-pointer shadow-xs"
+              >
+                Reset All Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {filteredEvents.map((event) => (
               <EventCard key={event._id || event.id} event={event} />
             ))}
