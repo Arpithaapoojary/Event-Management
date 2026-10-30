@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
+import Footer from './components/common/Footer';
 import HomePage from './pages/HomePage';
 import EventDetailPage from './pages/EventDetailPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </BrowserRouter>
   );

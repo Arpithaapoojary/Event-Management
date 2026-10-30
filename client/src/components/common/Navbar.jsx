@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, ShieldCheck, Sparkles } from 'lucide-react';
+import { Calendar, ShieldCheck } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
+  const [hasAdminToken, setHasAdminToken] = useState(false);
+
+  useEffect(() => {
+    // Check if an admin is logged in
+    setHasAdminToken(Boolean(localStorage.getItem('admin_token')));
+  }, [location]);
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 border-b border-slate-200/80 transition-all">
@@ -37,17 +43,20 @@ export default function Navbar() {
             Explore Events
           </Link>
 
-          <Link
-            to="/admin"
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-              isAdmin
-                ? 'text-indigo-600 bg-indigo-50 border border-indigo-200'
-                : 'text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 border border-slate-200'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4 text-indigo-500" />
-            <span>Admin Portal</span>
-          </Link>
+          {/* Admin link shown only if logged in or currently inside admin section */}
+          {(isAdmin || hasAdminToken) && (
+            <Link
+              to="/admin"
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                isAdmin
+                  ? 'text-indigo-600 bg-indigo-50 border border-indigo-200'
+                  : 'text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/50 border border-slate-200'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-indigo-500" />
+              <span>Admin Portal</span>
+            </Link>
+          )}
         </nav>
       </div>
     </header>
