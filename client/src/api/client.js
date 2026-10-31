@@ -9,7 +9,7 @@ const api = axios.create({
 
 // Request interceptor to attach admin key if logged in
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
+  const token = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
   if (token) {
     config.headers['x-admin-key'] = token;
   }
@@ -25,6 +25,7 @@ api.interceptors.response.use(
 
     // 1. Session expired / Unauthenticated (401)
     if (status === 401 && currentPath.startsWith('/admin') && currentPath !== '/admin/login') {
+      sessionStorage.removeItem('admin_token');
       localStorage.removeItem('admin_token');
       window.location.href = '/admin/login?reason=expired';
     }

@@ -1,26 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ShieldCheck,
   Menu,
   X,
   Compass,
   Music,
   Cpu,
   Trophy,
-  Lock,
   ChevronRight,
 } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
-  const [hasAdminToken, setHasAdminToken] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check if an admin is logged in
-    setHasAdminToken(Boolean(localStorage.getItem('admin_token')));
     // Automatically close mobile menu on route change
     setMobileMenuOpen(false);
   }, [location]);
@@ -126,26 +120,8 @@ export default function Navbar() {
           </button>
         </nav>
 
-        {/* Right Desktop Actions (36-40px height, 8px radius, 14px font) */}
+        {/* Right Desktop Actions (Explore Events button) */}
         <div className="hidden md:flex items-center gap-3">
-          {hasAdminToken ? (
-            <Link
-              to="/admin"
-              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-[8px] text-[14px] font-medium text-slate-900 bg-white border border-slate-300 shadow-2xs hover:bg-slate-50 transition-colors"
-            >
-              <ShieldCheck className="w-4 h-4 text-slate-700" />
-              <span>Admin Console</span>
-            </Link>
-          ) : (
-            <Link
-              to="/admin/login"
-              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-[8px] text-[14px] font-medium text-slate-700 hover:text-slate-950 hover:bg-white/80 border border-slate-300 transition-colors"
-            >
-              <Lock className="w-4 h-4 text-slate-500" />
-              <span>Coordinator Access</span>
-            </Link>
-          )}
-
           <button
             type="button"
             onClick={scrollToEvents}
@@ -251,40 +227,6 @@ export default function Navbar() {
                 </div>
                 <span className="text-xs text-slate-400 font-medium">Tournaments</span>
               </button>
-            </div>
-
-            <div className="border-t border-slate-100 my-4 pt-4">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 px-3">
-                Institutional Management
-              </div>
-
-              {hasAdminToken ? (
-                <Link
-                  to="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-black transition-colors"
-                  role="menuitem"
-                >
-                  <div className="flex items-center gap-3">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Open Admin Console</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </Link>
-              ) : (
-                <Link
-                  to="/admin/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors"
-                  role="menuitem"
-                >
-                  <div className="flex items-center gap-3">
-                    <Lock className="w-4 h-4 text-slate-500" />
-                    <span>Coordinator Sign-In</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </Link>
-              )}
             </div>
           </div>
         </div>

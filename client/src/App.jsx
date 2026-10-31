@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import HomePage from './pages/HomePage';
@@ -8,9 +8,24 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import Forbidden403Page from './pages/admin/Forbidden403Page';
 
+function SessionGuard() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // If the admin comes out of the admin section, end the session immediately
+    if (!location.pathname.startsWith('/admin')) {
+      sessionStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_token');
+    }
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <SessionGuard />
       <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900">
         <Navbar />
         <div className="flex-1">

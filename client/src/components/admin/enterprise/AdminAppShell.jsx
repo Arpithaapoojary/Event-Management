@@ -169,37 +169,38 @@ export default function AdminAppShell({
       {/* MAIN CONTAINER (Top bar + Max 1280px Workspace)           */}
       {/* ========================================================= */}
       <div className="flex-1 min-w-0 flex flex-col min-h-screen">
-        {/* Slim Top Bar (56px) */}
-        <header className="h-14 bg-white border-b border-[#E2E8F0] sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6">
-          {/* Left: Mobile Toggle & Breadcrumb */}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileDrawerOpen(true)}
-              className="md:hidden p-1.5 rounded-[6px] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
-              aria-label="Open sidebar"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+        {/* Slim Top Bar (56px) - aligned to max-w-[1280px] workspace */}
+        <header className="h-14 bg-white border-b border-[#E2E8F0] sticky top-0 z-20">
+          <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+            {/* Left: Mobile Toggle & Breadcrumb */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileDrawerOpen(true)}
+                className="md:hidden p-1.5 rounded-[6px] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                aria-label="Open sidebar"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-            <div className="flex items-center gap-2 text-[14px]">
-              <span className="text-[#64748B] hidden sm:inline">EventFlow</span>
-              <span className="text-[#CBD5E1] hidden sm:inline">/</span>
-              <span className="text-[#0F172A] font-medium">
-                {currentTabLabel}
-              </span>
+              <div className="flex items-center gap-2 text-[14px]">
+                <span className="text-[#64748B] hidden sm:inline">EventFlow</span>
+                <span className="text-[#CBD5E1] hidden sm:inline">/</span>
+                <span className="text-[#0F172A] font-medium">
+                  {currentTabLabel}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* Right: User Menu (Initials, Name, Role, Dropdown) */}
-          <div className="relative" ref={userMenuRef}>
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen((prev) => !prev)}
-              aria-expanded={userMenuOpen}
-              aria-haspopup="true"
-              className="flex items-center gap-2.5 p-1.5 rounded-[6px] hover:bg-[#F1F5F9] transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#2563EB]"
-            >
+            {/* Right: User Menu (Initials, Name, Role, Dropdown) */}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+                className="flex items-center gap-2.5 p-1.5 rounded-[6px] hover:bg-[#F1F5F9] transition-colors cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              >
               <div className="w-7 h-7 rounded-[6px] bg-[#0F172A] text-white text-[11px] font-medium flex items-center justify-center shrink-0">
                 EC
               </div>
@@ -234,13 +235,15 @@ export default function AdminAppShell({
                 <div className="py-1 border-b border-[#E2E8F0]">
                   <Link
                     to="/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setUserMenuOpen(false)}
+                    onClick={() => {
+                      sessionStorage.removeItem('admin_token');
+                      localStorage.removeItem('admin_token');
+                      setUserMenuOpen(false);
+                    }}
                     className="flex items-center justify-between px-3 py-2 text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
                     role="menuitem"
                   >
-                    <span>View public site</span>
+                    <span>View public site (exit)</span>
                     <ExternalLink className="w-3.5 h-3.5 text-[#64748B]" />
                   </Link>
                 </div>
@@ -262,6 +265,7 @@ export default function AdminAppShell({
               </div>
             )}
           </div>
+        </div>
         </header>
 
         {/* Main Workspace (Max-width 1280px, 24px padding, 24px gap between sections) */}

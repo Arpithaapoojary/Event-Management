@@ -107,7 +107,7 @@ export default function AdminDashboardPage() {
 
   // Authentication check
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
+    const token = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
     if (!token) {
       navigate('/admin/login');
       return;
@@ -173,6 +173,7 @@ export default function AdminDashboardPage() {
   }, [activeTab, selectedEventId]);
 
   const handleLogout = () => {
+    sessionStorage.removeItem('admin_token');
     localStorage.removeItem('admin_token');
     navigate('/admin/login');
   };
@@ -492,6 +493,16 @@ export default function AdminDashboardPage() {
                       className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#F8FAFC] -mx-2 px-2 rounded-[6px] transition-colors cursor-pointer"
                     >
                       <div className="min-w-0 flex items-center gap-3">
+                        <img
+                          src={ev.imageUrl}
+                          alt=""
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+                          }}
+                          className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
+                        />
                         <div className="text-[12px] text-[#64748B] tabular-nums shrink-0 w-16">
                           <div>{evDate}</div>
                           <div className="text-[11px] text-[#64748B]">{evTime}</div>
@@ -725,9 +736,9 @@ export default function AdminDashboardPage() {
                               onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src =
-                                  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+                                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
                               }}
-                              className="w-10 h-10 rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
+                              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
                             />
                             <div className="min-w-0 flex-1 overflow-hidden">
                               <button

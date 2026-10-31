@@ -35,6 +35,7 @@ export default function AdminLoginPage() {
       setError(null);
       const res = await api.post('/admin/login', { passcode: passcode.trim() });
       if (res && res.token) {
+        sessionStorage.setItem('admin_token', res.token);
         localStorage.setItem('admin_token', res.token);
         navigate('/admin');
       }
