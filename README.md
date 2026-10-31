@@ -229,3 +229,40 @@ EventFlow strictly adheres to an **institutional soft-deletion strategy**:
 - **Automated Email Confirmation**: Integrating Nodemailer / SendGrid for email ticket confirmations.
 - **Waitlist Support**: Adding automatic waitlists when an event reaches maximum capacity.
 
+---
+
+## 12. Production Deployment Guide
+
+EventFlow is configured for instant cloud deployment:
+
+### **Backend Deployment: Render (Web Service)**
+1. Sign in to [Render](https://render.com) with your GitHub account.
+2. Click **New +** > **Web Service**.
+3. Select your repository: `Arpithaapoojary/Event-Management`.
+4. Configure service settings:
+   - **Root Directory**: `server`
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+5. Under **Environment Variables**, add:
+   - `NODE_ENV`: `production`
+   - `MONGODB_URI`: `<your MongoDB Atlas connection string>`
+   - `JWT_SECRET`: `<any secure random string>`
+   - `ADMIN_KEY`: `admin2026`
+6. Click **Deploy Web Service**. Render will generate your backend URL (e.g., `https://event-management-api.onrender.com`).
+
+---
+
+### **Frontend Deployment: Vercel**
+1. Sign in to [Vercel](https://vercel.com) with your GitHub account.
+2. Click **Add New...** > **Project** and import `Event-Management`.
+3. In project settings:
+   - **Root Directory**: Click edit and select `client`.
+   - **Framework Preset**: `Vite` (auto-detected).
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Under **Environment Variables**, add:
+   - `VITE_API_URL`: `https://<your-render-backend-subdomain>.onrender.com/api`
+5. Click **Deploy**. Vercel will build and assign a live production URL (e.g., `https://event-management.vercel.app`) with automatic HTTPS and global edge CDN.
+
+
