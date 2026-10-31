@@ -112,7 +112,7 @@ export default function EventDetailPage() {
             <span>Back to Event Lineup</span>
           </Link>
 
-          <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans hidden sm:inline-block">
+          <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-display hidden sm:inline-block">
             ANNUAL CAMPUS EVENT 2026
           </span>
         </div>
@@ -185,17 +185,17 @@ export default function EventDetailPage() {
 
           {/* Eyebrow with Category */}
           <div className="mb-1.5 flex items-center gap-2 flex-wrap">
-            <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-indigo-600 font-sans">
+            <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-indigo-600 font-display">
               {event.category || 'Cultural'} ARENA
             </span>
             <span className="text-slate-300">•</span>
-            <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans">
+            <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-display">
               EVENT DETAILS &amp; PASS REGISTRATION
             </span>
           </div>
 
           {/* Clean Modern Headline */}
-          <h1 className="text-[clamp(24px,3vw,36px)] font-bold text-slate-950 tracking-tight leading-tight mb-5">
+          <h1 className="text-[clamp(24px,3vw,36px)] font-black font-display text-slate-950 tracking-tight leading-tight mb-5">
             {event.title}
           </h1>
 
@@ -273,7 +273,7 @@ export default function EventDetailPage() {
 
           {/* About this Event */}
           <div className="mb-6">
-            <h2 className="text-[20px] font-semibold text-slate-950 tracking-tight mb-2">
+            <h2 className="text-[20px] font-bold font-display text-slate-950 tracking-tight mb-2">
               About this Event
             </h2>
             <p className="text-slate-600 text-[14px] sm:text-[15px] leading-relaxed font-normal whitespace-pre-line max-w-3xl">

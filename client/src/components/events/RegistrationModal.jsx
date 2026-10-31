@@ -231,7 +231,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Registration Confirmed</span>
               </div>
-              <h3 className="text-lg font-bold text-white pr-8 line-clamp-1 leading-snug">
+              <h3 className="text-[16px] font-bold font-display text-white pr-8 line-clamp-1 leading-snug">
                 {event.title}
               </h3>
               <p className="text-xs text-slate-300 flex items-center gap-3 mt-1.5 font-normal">
@@ -364,7 +364,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                 <Ticket className="w-3.5 h-3.5" />
                 <span>Event Registration</span>
               </div>
-              <h3 className="text-[16px] font-semibold text-white pr-8 line-clamp-1 leading-snug">
+              <h3 className="text-[16px] font-bold font-display text-white pr-8 line-clamp-1 leading-snug">
                 {event.title}
               </h3>
               <p className="text-[12px] text-slate-300 flex items-center gap-3 mt-1 font-normal">

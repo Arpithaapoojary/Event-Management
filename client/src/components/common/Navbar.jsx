@@ -89,7 +89,7 @@ export default function Navbar() {
           onClick={() => setMobileMenuOpen(false)}
           className="flex items-center group cursor-pointer"
         >
-          <span className="font-bold text-[21px] tracking-tight text-slate-950 group-hover:text-black transition-colors">
+          <span className="font-extrabold text-[21px] tracking-tight text-slate-950 font-display group-hover:text-black transition-colors">
             EventFlow
           </span>
         </Link>

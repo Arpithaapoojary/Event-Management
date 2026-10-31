@@ -194,13 +194,13 @@ export default function HomePage() {
           <div className="mb-6 sm:mb-8">
             {/* Eyebrow Label (12px, letter-spacing 0.08em) */}
             <div className="mb-1.5">
-              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans">
+              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-display">
                 EXPLORE • ANNUAL CAMPUS EVENT 2026
               </span>
             </div>
 
-            {/* Page Title: clamp(28px, 3vw, 40px), weight 700, line-height 1.15 */}
-            <h1 className="text-[clamp(28px,3vw,40px)] font-bold text-slate-950 leading-[1.15] mb-2 sm:mb-3 tracking-tight">
+            {/* Page Title: clamp(28px, 3vw, 40px), weight 700/800, line-height 1.15 */}
+            <h1 className="text-[clamp(28px,3vw,40px)] font-black font-display text-slate-950 leading-[1.15] mb-2 sm:mb-3 tracking-tight">
               Event Lineup
             </h1>
 
@@ -239,8 +239,8 @@ export default function HomePage() {
                     {cat.badgeText}
                   </span>
 
-                  {/* Card Title: 20px, weight 600 */}
-                  <h3 className="text-[20px] font-semibold text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
+                  {/* Card Title: 20px, weight 600/700 */}
+                  <h3 className="text-[20px] font-bold font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
                     {cat.title}
                   </h3>
 
@@ -283,12 +283,12 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
             <div className="mb-1.5">
-              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans">
+              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-display">
                 ALL SUB-EVENTS • 2026 CAMPUS SCHEDULE
               </span>
             </div>
 
-            <h2 className="text-[clamp(22px,2.5vw,28px)] font-bold text-slate-950 tracking-tight leading-[1.2] mb-1.5">
+            <h2 className="text-[clamp(22px,2.5vw,28px)] font-black font-display text-slate-950 tracking-tight leading-[1.2] mb-1.5">
               Live &amp; Upcoming Events
             </h2>
 

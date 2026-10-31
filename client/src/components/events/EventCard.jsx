@@ -51,8 +51,8 @@ export default function EventCard({ event }) {
           </span>
         </div>
 
-        {/* Card Title: 20px weight 600 */}
-        <h3 className="text-[18px] sm:text-[20px] font-semibold text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors line-clamp-1 w-full px-1">
+        {/* Card Title: 20px weight 600/700 font-display */}
+        <h3 className="text-[18px] sm:text-[20px] font-bold font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors line-clamp-1 w-full px-1">
           {event.title}
         </h3>
 
