@@ -10,8 +10,6 @@ import {
   AlertCircle,
   CheckCircle2,
   X,
-  ShieldCheck,
-  Ticket,
 } from 'lucide-react';
 import api from '../api/client';
 import RegistrationModal from '../components/events/RegistrationModal';
@@ -286,21 +284,7 @@ export default function EventDetailPage() {
               {event.description}
             </p>
 
-            {/* Highlights badges */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Instant Digital Ticket Pass</span>
-              </span>
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold">
-                <Ticket className="w-4 h-4 text-slate-600" />
-                <span>Free Entry for Students</span>
-              </span>
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold">
-                <Users className="w-4 h-4 text-amber-500" />
-                <span>Open to All Colleges</span>
-              </span>
-            </div>
+
           </div>
 
           {/* ======================================================== */}
