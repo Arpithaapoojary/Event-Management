@@ -147,9 +147,9 @@ export default function EventDetailPage() {
         {/* ======================================================== */}
         {/* MAIN EVENT SHOWCASE CARD (Matching HomePage rounded-[36px]) */}
         {/* ======================================================== */}
-        <div className="bg-white rounded-[36px] p-6 sm:p-10 shadow-xl border border-white/80 overflow-hidden mb-8">
+        <div className="bg-white rounded-[24px] sm:rounded-[36px] p-5 sm:p-10 shadow-xl border border-white/80 overflow-hidden mb-8">
           {/* Hero Banner Container */}
-          <div className="relative aspect-[21/9] sm:h-96 w-full rounded-3xl overflow-hidden bg-slate-950 mb-8 shadow-sm group">
+          <div className="relative aspect-[16/10] sm:aspect-[21/9] sm:h-96 min-h-[200px] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 mb-6 sm:mb-8 shadow-sm group">
             <img
               src={event.imageUrl}
               alt={event.title}
@@ -161,8 +161,8 @@ export default function EventDetailPage() {
             />
 
             {/* Status Badge in Top Right */}
-            <div className="absolute top-4 right-4 z-10">
-              <span className="bg-[#FFC700] text-slate-950 font-black text-xs px-4 py-2 rounded-full inline-block shadow-md uppercase tracking-wider">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+              <span className="bg-[#FFC700] text-slate-950 font-black text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full inline-block shadow-md uppercase tracking-wider">
                 {event.status === 'FULL'
                   ? 'Registration Full'
                   : event.status === 'PAST'
@@ -172,11 +172,11 @@ export default function EventDetailPage() {
             </div>
 
             {/* Category and Official Pass pill in Bottom Left */}
-            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 flex-wrap">
-              <span className="bg-slate-950 text-white font-extrabold text-xs px-4 py-2 rounded-full shadow-md uppercase tracking-wider">
+            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <span className="bg-slate-950 text-white font-extrabold text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-md uppercase tracking-wider">
                 {event.category || 'Cultural'}
               </span>
-              <span className="bg-slate-950/85 backdrop-blur-md text-white font-extrabold text-xs px-4 py-2 rounded-full shadow-md inline-flex items-center gap-2">
+              <span className="bg-slate-950/85 backdrop-blur-md text-white font-extrabold text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-md inline-flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 <span>Verified Campus Event</span>
               </span>

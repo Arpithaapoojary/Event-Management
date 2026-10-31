@@ -205,10 +205,10 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
     : 'CONFIRMED';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-hero-fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-hero-fade-in font-sans overflow-y-auto">
       {/* Modal Dialog with smooth entrance animation */}
       <div
-        className="relative w-full max-w-lg bg-white rounded-[28px] shadow-2xl border border-white/60 overflow-hidden transform animate-modal-in transition-all"
+        className="relative w-full max-w-lg bg-white rounded-[24px] sm:rounded-[28px] shadow-2xl border border-white/60 overflow-hidden transform animate-modal-in transition-all max-h-[92vh] overflow-y-auto my-auto"
         role="dialog"
         aria-modal="true"
       >

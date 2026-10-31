@@ -57,36 +57,36 @@ export default function AdminLoginPage() {
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs hover:shadow-xs transition-all active:scale-95 group"
+            className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs hover:shadow-xs transition-all active:scale-95 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span>Back to Public Portal</span>
           </Link>
-          <span className="text-xs font-semibold tracking-wide uppercase text-slate-500">
+          <span className="text-xs font-semibold tracking-wide uppercase text-slate-500 hidden sm:inline-block">
             Institutional Console
           </span>
         </div>
 
         {/* Login Card - Clean White Professional Architecture */}
-        <div className="w-full bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden transition-all duration-300">
+        <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden transition-all duration-300">
           {/* Header block (Clean White Executive Styling) */}
-          <div className="px-8 pt-8 pb-6 bg-white border-b border-slate-100 text-center">
+          <div className="px-5 sm:px-8 pt-7 sm:pt-8 pb-5 sm:pb-6 bg-white border-b border-slate-100 text-center">
             <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center mx-auto mb-4 shadow-sm animate-float-gentle">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mb-2">
               <span>Admin Authentication</span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
               Campus Event Operations
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Authorized coordinators and institutional faculty sign-in
             </p>
           </div>
 
           {/* Form Body */}
-          <div className="p-6 sm:p-8">
+          <div className="p-5 sm:p-8">
             <form onSubmit={handleLogin} className="space-y-5">
               {error && (
                 <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-start gap-2.5 animate-shake">

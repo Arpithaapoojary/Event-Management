@@ -68,7 +68,7 @@ export default function EventDetailDrawer({
         className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150 cursor-pointer"
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
         <aside
           role="dialog"
           aria-modal="true"

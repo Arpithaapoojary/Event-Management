@@ -111,7 +111,7 @@ export function Pagination({
       </div>
 
       {/* Right: page size & pagination navigation */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto">
         {/* Rows per page selector */}
         {pageSizeOptions && onPageSizeChange && (
           <div className="flex items-center gap-2">

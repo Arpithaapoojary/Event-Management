@@ -194,13 +194,13 @@ export default function HomePage() {
           <div className="mb-10 sm:mb-12">
             {/* Super-Kicker */}
             <div className="mb-3">
-              <span className="text-xs font-black tracking-[0.25em] uppercase text-slate-500 font-display">
+              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.25em] uppercase text-slate-500 font-display break-words">
                 EXPLORE • ANNUAL CAMPUS EVENT 2026
               </span>
             </div>
 
             {/* Bold Display Headline: Event Lineup */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-none mb-4">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-tight mb-4">
               Event Lineup
             </h1>
 
@@ -217,15 +217,15 @@ export default function HomePage() {
             {CATEGORY_CARDS.map((cat) => (
               <div
                 key={cat.id}
-                className="relative bg-white rounded-[32px] p-5 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/70 flex flex-col justify-between overflow-hidden group"
+                className="relative bg-white rounded-[24px] sm:rounded-[32px] p-4 sm:p-5 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/70 flex flex-col justify-between overflow-hidden group"
               >
                 {/* Smooth Bottom Gradient matching reference */}
                 <div
-                  className={`absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[32px]`}
+                  className={`absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[24px] sm:rounded-b-[32px]`}
                 />
 
                 {/* Upper Visual Container with Rounded Colored Plate */}
-                <div className="relative w-full h-64 sm:h-72 flex items-center justify-center overflow-visible mb-4">
+                <div className="relative w-full h-56 sm:h-72 flex items-center justify-center overflow-visible mb-4">
                   {/* Colored Backdrop Block (Peach / Cyan / Amber) - inset so character pops out */}
                   <div
                     className={`absolute inset-x-4 top-3 bottom-4 rounded-3xl ${cat.plateColor} shadow-inner transition-transform duration-500 group-hover:scale-95`}
@@ -235,7 +235,7 @@ export default function HomePage() {
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="relative z-10 max-h-64 sm:max-h-72 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-sm"
+                    className="relative z-10 max-h-56 sm:max-h-72 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-sm"
                     loading="lazy"
                   />
                 </div>
@@ -292,13 +292,13 @@ export default function HomePage() {
           <div>
             {/* Super-Kicker */}
             <div className="mb-3">
-              <span className="text-xs font-black tracking-[0.25em] uppercase text-slate-500 font-display">
+              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.25em] uppercase text-slate-500 font-display break-words">
                 ALL SUB-EVENTS • 2026 CAMPUS SCHEDULE
               </span>
             </div>
 
             {/* Display Headline */}
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-none mb-4">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-slate-950 tracking-tight leading-tight mb-3">
               Live &amp; Upcoming Events
             </h2>
 
@@ -318,10 +318,10 @@ export default function HomePage() {
 
         {/* Selected Category Filter Banner (if user filtered via category card or pill) */}
         {selectedCategory !== 'all' && (
-          <div className="mb-8 p-4 rounded-3xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs animate-hero-fade-in">
+          <div className="mb-8 p-4 rounded-3xl bg-white border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs animate-hero-fade-in">
             <div className="flex items-center gap-3">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-sm font-bold text-slate-900">
+              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-xs sm:text-sm font-bold text-slate-900">
                 Filtered by category arena:{' '}
                 <span className="font-extrabold capitalize text-slate-950">
                   {selectedCategory} Events
@@ -344,7 +344,7 @@ export default function HomePage() {
         <div className="flex flex-col gap-5 mb-10">
           <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
             {/* Arena Category Pills */}
-            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto shrink-0 max-w-full">
+            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto no-scrollbar shrink-0 max-w-full">
               {[
                 { id: 'all', label: 'All Arenas', count: events.length },
                 { id: 'cultural', label: 'Cultural', count: culturalCount },
@@ -407,9 +407,9 @@ export default function HomePage() {
           </div>
 
           {/* Secondary Status Tabs */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Status:</span>
-            <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-slate-200/60 w-fit">
+            <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-slate-200/60 overflow-x-auto no-scrollbar max-w-full">
               {[
                 { id: 'all', label: 'All Status' },
                 { id: 'upcoming', label: 'Upcoming' },

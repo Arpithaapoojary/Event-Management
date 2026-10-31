@@ -568,8 +568,8 @@ export default function AdminDashboardPage() {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 sm:justify-end shrink-0">
-                        <div className="w-32">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 w-full sm:w-auto">
+                        <div className="w-28 sm:w-32">
                           <div className="flex items-center justify-between text-[11px] mb-1">
                             <span className="text-[#6B7280]">Occupancy</span>
                             <span className="font-semibold text-[#111827] tabular-nums">{ev.percent}%</span>
