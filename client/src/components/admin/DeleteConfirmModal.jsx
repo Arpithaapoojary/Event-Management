@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from './enterprise';
 
 /**
- * Enterprise Delete Confirmation Modal (Module 4)
- * - Explicitly states the event name and how many registrations are affected
- * - "Cancel" and red "Delete event" button
- * - Never deletes on a single click
- * - Preserves registrations under soft-delete policy
+ * Clean Confirm Delete Dialog (Linear / Stripe / Vercel style)
+ * - Names the event and affected registrations count
+ * - Calm neutral layout: "Cancel" (secondary) and "Delete event" (red)
  */
 export default function DeleteConfirmModal({
   isOpen,
@@ -33,62 +31,43 @@ export default function DeleteConfirmModal({
   const affectedCount = event.registeredCount || 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-xs font-sans">
       <div
-        className="relative w-full max-w-md bg-white rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#E5E7EB] overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-md bg-white rounded-[8px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-[#E2E8F0] overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-event-title"
       >
         {/* Header */}
-        <div className="relative px-6 py-5 bg-white border-b border-[#E5E7EB]">
+        <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
+          <h2 id="delete-event-title" className="text-[16px] leading-[24px] font-semibold text-[#0F172A]">
+            Delete event
+          </h2>
           <button
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="absolute top-5 right-5 p-1.5 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors cursor-pointer disabled:opacity-50"
-            aria-label="Close modal"
+            className="p-1 rounded-[6px] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer disabled:opacity-50"
+            aria-label="Close dialog"
           >
-            <X className="w-4 h-4 stroke-[1.5]" />
+            <X className="w-4 h-4" />
           </button>
+        </div>
 
-          <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#FEF2F2] text-[#991B1B] text-[12px] font-medium mb-1.5 border border-[#FCA5A5]">
-            <span>Soft Delete Event</span>
-          </div>
-          <h2 id="delete-event-title" className="text-[18px] font-semibold text-[#111827] tracking-[-0.01em]">
-            Delete Event
-          </h2>
-          <p className="text-[13px] text-[#6B7280] mt-0.5">
-            This will remove the event from the public catalog while preserving student data.
+        {/* Body */}
+        <div className="p-5 space-y-3">
+          <p className="text-[14px] leading-[20px] text-[#0F172A]">
+            Are you sure you want to delete <strong className="font-semibold">"{event.title}"</strong>?
+          </p>
+
+          <p className="text-[13px] leading-[18px] text-[#64748B]">
+            This event currently has <strong className="font-medium text-[#0F172A] tabular-nums">{affectedCount}</strong> registered {affectedCount === 1 ? 'attendee' : 'attendees'}.
+            The event will be removed from the public schedule while preserving registration records for institutional audit.
           </p>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6 space-y-4">
-          <p className="text-[13px] text-[#374151] leading-relaxed">
-            Are you sure you want to delete <strong className="font-semibold text-[#111827]">"{event.title}"</strong>?
-          </p>
-
-          {/* Registration impact notification */}
-          <div className="p-3.5 rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB] text-[13px] space-y-1.5">
-            <div className="flex items-center justify-between text-[#111827] font-medium">
-              <span>Affected Registrations:</span>
-              <span className="tabular-nums font-semibold text-[#111827]">
-                {affectedCount} {affectedCount === 1 ? 'attendee' : 'attendees'}
-              </span>
-            </div>
-            <p className="text-[12px] text-[#6B7280] leading-normal">
-              Under EventFlow's institutional soft-delete policy, all {affectedCount} registration records, contact details, and ticket IDs are retained as an archive and marked read-only.
-            </p>
-          </div>
-
-          <p className="text-[12px] text-[#6B7280]">
-            The event can be reviewed or restored anytime from the audit view.
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2.5 px-6 py-4 bg-[#F9FAFB] border-t border-[#E5E7EB]">
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2.5 px-5 py-3.5 bg-[#F8FAFC] border-t border-[#E2E8F0]">
           <Button
             variant="secondary"
             size="md"
@@ -99,12 +78,12 @@ export default function DeleteConfirmModal({
           </Button>
 
           <Button
-            variant="destructive"
+            variant="danger"
             size="md"
             onClick={onConfirm}
-            loading={isDeleting}
+            disabled={isDeleting}
           >
-            Delete event
+            {isDeleting ? 'Deleting...' : 'Delete event'}
           </Button>
         </div>
       </div>

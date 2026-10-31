@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
-  Calendar,
-  MapPin,
-  Users,
-  AlertCircle,
   Loader2,
   FolderOpen,
-  Link as LinkIcon,
-  Trash2,
 } from 'lucide-react';
 import api from '../../api/client';
 import { Button, FormField } from './enterprise';
@@ -46,7 +40,6 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
   const [imageMode, setImageMode] = useState('upload'); // 'upload' | 'url'
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-  const [uploadedFileName, setUploadedFileName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -66,9 +59,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
       } else {
         setImageMode('upload');
       }
-      setUploadedFileName(event.imageUrl ? 'Active Event Image' : '');
     } else {
-      // Default initial state for new event (tomorrow at 10:00 AM)
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(10, 0, 0, 0);
@@ -83,7 +74,6 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         category: 'Cultural',
       });
       setImageMode('upload');
-      setUploadedFileName('');
     }
     setErrors({});
     setServerError(null);
@@ -105,7 +95,6 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
     }
 
     setUploadError(null);
-    setUploadedFileName(file.name);
 
     // Instant local preview
     const reader = new FileReader();
@@ -138,9 +127,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
 
   const handleFileInputChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      processImageFile(file);
-    }
+    if (file) processImageFile(file);
   };
 
   const handleDragOver = (e) => {
@@ -157,82 +144,94 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processImageFile(file);
-    }
+    if (file) processImageFile(file);
   };
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !submitting) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, submitting, onClose]);
 
   if (!isOpen) return null;
 
-  // Strict client-side validation
-  const validate = () => {
-    const errs = {};
-    const trimmedTitle = formData.title.trim();
-    if (!trimmedTitle) {
-      errs.title = 'Event title is required and cannot be whitespace only.';
-    } else if (trimmedTitle.length < 3) {
-      errs.title = 'Title must be at least 3 characters.';
-    } else if (trimmedTitle.length > 120) {
-      errs.title = 'Title cannot exceed 120 characters.';
+  // Real-time client-side validation
+  const validateField = (name, value) => {
+    let err = null;
+    if (name === 'title') {
+      if (!value.trim()) err = 'Event title is required.';
+      else if (value.trim().length < 3) err = 'Title must be at least 3 characters.';
     }
-
-    const trimmedDescription = formData.description.trim();
-    if (!trimmedDescription) {
-      errs.description = 'Event description is required.';
-    } else if (trimmedDescription.length > 1000) {
-      errs.description = 'Description cannot exceed 1000 characters.';
+    if (name === 'venue') {
+      if (!value.trim()) err = 'Venue is required.';
     }
-
-    if (!formData.dateTime) {
-      errs.dateTime = 'Date and start time is required.';
-    } else {
-      const d = new Date(formData.dateTime);
-      if (isNaN(d.getTime())) {
-        errs.dateTime = 'Please enter a valid date and time.';
-      } else if (!isEditing && d <= new Date()) {
-        errs.dateTime = 'Event date must be in the future. Past dates cannot be scheduled.';
+    if (name === 'dateTime') {
+      if (!value) {
+        err = 'Date and start time are required.';
+      } else if (!isEditing) {
+        const selected = new Date(value);
+        if (selected <= new Date()) {
+          err = 'Scheduled date must be in the future.';
+        }
       }
     }
-
-    if (!formData.venue.trim()) {
-      errs.venue = 'Campus venue location is required.';
+    if (name === 'capacity') {
+      const num = parseInt(value, 10);
+      if (isNaN(num) || num < 1) {
+        err = 'Capacity must be at least 1 attendee.';
+      } else if (isEditing && event.registeredCount && num < event.registeredCount) {
+        err = `Cannot be lower than confirmed registrations (${event.registeredCount}).`;
+      }
     }
-
-    const cap = Number(formData.capacity);
-    if (!Number.isInteger(cap) || cap < 1) {
-      errs.capacity = 'Capacity must be a positive integer (at least 1 seat).';
-    } else if (isEditing && event.registeredCount && cap < event.registeredCount) {
-      errs.capacity = `Cannot reduce capacity below current registered attendees (${event.registeredCount}).`;
+    if (name === 'description') {
+      if (!value.trim()) err = 'Description is required.';
+      else if (value.trim().length < 10) err = 'Description must be at least 10 characters.';
     }
-
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+    return err;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
-    }
-    if (serverError) setServerError(null);
+    const fieldError = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: fieldError }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    setServerError(null);
+
+    // Validate all fields
+    const formErrors = {
+      title: validateField('title', formData.title),
+      venue: validateField('venue', formData.venue),
+      dateTime: validateField('dateTime', formData.dateTime),
+      capacity: validateField('capacity', formData.capacity),
+      description: validateField('description', formData.description),
+    };
+
+    const hasErrors = Object.values(formErrors).some(Boolean);
+    if (hasErrors) {
+      setErrors(formErrors);
+      return;
+    }
 
     try {
       setSubmitting(true);
-      setServerError(null);
-
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         dateTime: new Date(formData.dateTime).toISOString(),
         venue: formData.venue.trim(),
-        capacity: Number(formData.capacity),
-        imageUrl: formData.imageUrl.trim() || undefined,
+        capacity: parseInt(formData.capacity, 10),
+        imageUrl: formData.imageUrl.trim() || FALLBACK_PREVIEW,
         category: formData.category,
       };
 
@@ -243,9 +242,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         res = await api.post('/admin/events', payload);
       }
 
-      if (onSaved) {
-        onSaved(res.data);
-      }
+      onSaved(res.data);
       onClose();
     } catch (err) {
       setServerError(err.message || 'Failed to save event. Please check inputs.');
@@ -254,54 +251,60 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
     }
   };
 
+  const isFormValid =
+    formData.title.trim().length >= 3 &&
+    formData.venue.trim().length > 0 &&
+    Boolean(formData.dateTime) &&
+    parseInt(formData.capacity, 10) >= 1 &&
+    formData.description.trim().length >= 10 &&
+    !Object.values(errors).some(Boolean);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs overflow-y-auto font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-xs overflow-y-auto font-sans">
       <div
-        className="relative w-full max-w-2xl bg-white rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-[#E5E7EB] overflow-hidden my-8"
+        className="relative w-full max-w-2xl bg-white rounded-[8px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-[#E2E8F0] overflow-hidden my-8"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-headline"
       >
         {/* Header */}
-        <div className="relative px-6 py-5 bg-white border-b border-[#E5E7EB]">
+        <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
+          <div>
+            <h2 id="modal-headline" className="text-[16px] leading-[24px] font-semibold text-[#0F172A]">
+              {isEditing ? 'Edit event' : 'Create event'}
+            </h2>
+            <p className="text-[12px] leading-[16px] text-[#64748B]">
+              {isEditing
+                ? `Update details for "${event.title}".`
+                : 'Add a new authorized event to the campus schedule.'}
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-5 right-5 p-1.5 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors cursor-pointer"
-            aria-label="Close modal"
+            disabled={submitting}
+            className="p-1 rounded-[6px] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer disabled:opacity-50"
+            aria-label="Close dialog"
           >
-            <X className="w-4 h-4 stroke-[1.5]" />
+            <X className="w-4 h-4" />
           </button>
-
-          <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#F3F4F6] text-[#374151] text-[12px] font-medium mb-1.5">
-            <span>{isEditing ? 'Update Event' : 'Create Event'}</span>
-          </div>
-          <h2 id="modal-headline" className="text-[18px] font-semibold text-[#111827] tracking-[-0.01em]">
-            {isEditing ? 'Edit Event Details' : 'Create Campus Event'}
-          </h2>
-          <p className="text-[13px] text-[#6B7280] mt-0.5">
-            {isEditing
-              ? `Updating settings for "${event.title}". Registrations remain attached.`
-              : 'Add a new authorized event to the campus schedule and catalog.'}
-          </p>
         </div>
 
-        {/* Modal Form Body */}
+        {/* Modal Form Body: 2-column grid on desktop, 1 column on mobile */}
         <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
           {serverError && (
             <div
               role="alert"
-              className="p-3 rounded-[8px] bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-[13px] font-medium flex items-start gap-2"
+              className="p-3 rounded-[6px] bg-[#FEF2F2] border border-[#DC2626]/20 text-[#DC2626] text-[13px] font-normal"
             >
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 stroke-[1.5]" />
-              <span>{serverError}</span>
+              {serverError}
             </div>
           )}
 
-          {/* Event Title */}
+          {/* Event Title (Full Width) */}
           <FormField
             id="event-title"
-            label="Event Title"
+            label="Event title"
             required
             error={errors.title}
             currentLength={formData.title.length}
@@ -314,64 +317,67 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               value={formData.title}
               onChange={handleChange}
               maxLength={120}
-              placeholder="e.g. Annual Tech Symposium 2026"
-              aria-invalid={Boolean(errors.title)}
-              aria-describedby={errors.title ? 'event-title-error' : undefined}
-              className={`w-full h-9 px-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors text-[#111827] placeholder:text-[#9CA3AF] ${
+              placeholder="e.g. Annual Technical Symposium 2026"
+              className={`w-full h-[36px] px-3 text-[14px] rounded-[6px] border bg-white focus:outline-hidden transition-colors text-[#0F172A] placeholder:text-[#64748B] ${
                 errors.title
-                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
+                  ? 'border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]'
+                  : 'border-[#E2E8F0] focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB]'
               }`}
             />
           </FormField>
 
-          {/* Category Selector (Cultural, Technical, Sports) */}
-          <div>
-            <label className="block text-[13px] font-medium text-[#374151] mb-1.5">
-              Category <span className="text-[#EF4444]">*</span>
-            </label>
-            <div className="grid grid-cols-3 gap-2.5">
-              {[
-                { id: 'Cultural', label: 'Cultural', desc: 'Arts, Music, Dance' },
-                { id: 'Technical', label: 'Technical', desc: 'Coding, AI, Robotics' },
-                { id: 'Sports', label: 'Sports', desc: 'Athletics, Tournaments' },
-              ].map((cat) => {
-                const isSelected = formData.category === cat.id;
-                return (
-                  <button
-                    type="button"
-                    key={cat.id}
-                    onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
-                    className={`p-3 rounded-[8px] border text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? 'border-[#0F172A] bg-[#0F172A] text-white shadow-sm'
-                        : 'border-[#E5E7EB] bg-white hover:bg-[#F9FAFB] text-[#111827]'
-                    }`}
-                  >
-                    <div className="font-semibold text-[13px]">
-                      {cat.label}
-                    </div>
-                    <span
-                      className={`text-[11px] block mt-0.5 line-clamp-1 ${
-                        isSelected ? 'text-slate-300' : 'text-[#6B7280]'
-                      }`}
-                    >
-                      {cat.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          {/* 2-Column Grid: Category & Seating Capacity */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField id="event-category" label="Category" required>
+              <select
+                id="event-category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full h-[36px] px-3 text-[14px] font-normal text-[#0F172A] bg-white border border-[#E2E8F0] rounded-[6px] focus:outline-hidden focus:ring-1 focus:ring-[#2563EB] cursor-pointer"
+              >
+                <option value="Cultural">Cultural (Arts, Music, Dance)</option>
+                <option value="Technical">Technical (Coding, Robotics, AI)</option>
+                <option value="Sports">Sports (Athletics, Tournaments)</option>
+              </select>
+            </FormField>
+
+            <FormField
+              id="event-capacity"
+              label="Seating capacity"
+              required
+              error={errors.capacity}
+              helperText={
+                isEditing && event.registeredCount
+                  ? `Min ${event.registeredCount} (confirmed attendees)`
+                  : 'Maximum attendee headcount'
+              }
+            >
+              <input
+                id="event-capacity"
+                type="number"
+                name="capacity"
+                min={isEditing ? event.registeredCount || 1 : 1}
+                value={formData.capacity}
+                onChange={handleChange}
+                placeholder="100"
+                className={`w-full h-[36px] px-3 text-[14px] rounded-[6px] border bg-white focus:outline-hidden transition-colors tabular-nums text-[#0F172A] ${
+                  errors.capacity
+                    ? 'border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]'
+                    : 'border-[#E2E8F0] focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB]'
+                }`}
+              />
+            </FormField>
           </div>
 
-          {/* 2-Column: Date & Time and Venue */}
+          {/* 2-Column Grid: Date & Time and Venue */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               id="event-datetime"
-              label="Date & Start Time"
+              label="Date & start time"
               required
               error={errors.dateTime}
-              helperText={!isEditing ? 'Must be scheduled in the future' : undefined}
+              helperText={!isEditing ? 'Must be scheduled in future' : undefined}
             >
               <input
                 id="event-datetime"
@@ -379,19 +385,17 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
                 name="dateTime"
                 value={formData.dateTime}
                 onChange={handleChange}
-                aria-invalid={Boolean(errors.dateTime)}
-                aria-describedby={errors.dateTime ? 'event-datetime-error' : undefined}
-                className={`w-full h-9 px-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors font-medium text-[#111827] ${
+                className={`w-full h-[36px] px-3 text-[14px] rounded-[6px] border bg-white focus:outline-hidden transition-colors text-[#0F172A] ${
                   errors.dateTime
-                    ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                    : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
+                    ? 'border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]'
+                    : 'border-[#E2E8F0] focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB]'
                 }`}
               />
             </FormField>
 
             <FormField
               id="event-venue"
-              label="Campus Venue"
+              label="Campus venue"
               required
               error={errors.venue}
             >
@@ -401,75 +405,37 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
                 name="venue"
                 value={formData.venue}
                 onChange={handleChange}
-                placeholder="e.g. Main Auditorium / Lab 4"
-                aria-invalid={Boolean(errors.venue)}
-                aria-describedby={errors.venue ? 'event-venue-error' : undefined}
-                className={`w-full h-9 px-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors text-[#111827] placeholder:text-[#9CA3AF] ${
+                placeholder="e.g. Main Auditorium"
+                className={`w-full h-[36px] px-3 text-[14px] rounded-[6px] border bg-white focus:outline-hidden transition-colors text-[#0F172A] placeholder:text-[#64748B] ${
                   errors.venue
-                    ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                    : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
+                    ? 'border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]'
+                    : 'border-[#E2E8F0] focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB]'
                 }`}
               />
             </FormField>
           </div>
 
-          {/* Seating Capacity Limit */}
-          <FormField
-            id="event-capacity"
-            label="Seating Capacity Limit"
-            required
-            error={errors.capacity}
-            helperText={
-              isEditing && event.registeredCount
-                ? `Minimum ${event.registeredCount} seats (current confirmed registrations)`
-                : 'Maximum attendee headcount'
-            }
-          >
-            <input
-              id="event-capacity"
-              type="number"
-              name="capacity"
-              min={isEditing ? event.registeredCount || 1 : 1}
-              value={formData.capacity}
-              onChange={handleChange}
-              placeholder="e.g. 100"
-              aria-invalid={Boolean(errors.capacity)}
-              aria-describedby={errors.capacity ? 'event-capacity-error' : undefined}
-              className={`w-full h-9 px-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors tabular-nums font-medium text-[#111827] ${
-                errors.capacity
-                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
-              }`}
-            />
-          </FormField>
-
-          {/* Event Banner Image: Folder File Upload or Web Link */}
-          <div className="space-y-2 pt-1">
+          {/* Banner Image (File upload or URL) */}
+          <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="block text-[13px] font-medium text-[#374151]">
-                Event Banner Image
+              <label className="text-[13px] font-medium text-[#0F172A]">
+                Event banner image
               </label>
-
-              {/* Mode Toggle */}
-              <div className="inline-flex p-0.5 rounded-[6px] bg-[#F3F4F6] border border-[#E5E7EB]">
+              <div className="inline-flex rounded-[6px] border border-[#E2E8F0] p-0.5 bg-[#F8FAFC]">
                 <button
                   type="button"
                   onClick={() => setImageMode('upload')}
-                  className={`px-2.5 py-1 text-[12px] font-medium rounded-[4px] transition-all cursor-pointer ${
-                    imageMode === 'upload'
-                      ? 'bg-white text-[#111827] shadow-xs'
-                      : 'text-[#6B7280] hover:text-[#111827]'
+                  className={`px-2 py-0.5 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
+                    imageMode === 'upload' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B]'
                   }`}
                 >
-                  Upload File
+                  Upload file
                 </button>
                 <button
                   type="button"
                   onClick={() => setImageMode('url')}
-                  className={`px-2.5 py-1 text-[12px] font-medium rounded-[4px] transition-all cursor-pointer ${
-                    imageMode === 'url'
-                      ? 'bg-white text-[#111827] shadow-xs'
-                      : 'text-[#6B7280] hover:text-[#111827]'
+                  className={`px-2 py-0.5 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
+                    imageMode === 'url' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B]'
                   }`}
                 >
                   Web URL
@@ -486,49 +452,41 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
                   accept="image/png, image/jpeg, image/jpg, image/webp"
                   className="hidden"
                 />
-
                 <div
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border border-dashed rounded-[8px] p-4 text-center cursor-pointer transition-colors ${
-                    isDragging
-                      ? 'border-[#0F172A] bg-[#F8FAFC]'
-                      : 'border-[#D1D5DB] hover:border-[#9CA3AF] bg-[#FAFAFA]'
+                  className={`border border-dashed rounded-[6px] p-3 text-center cursor-pointer transition-colors ${
+                    isDragging ? 'border-[#0F172A] bg-[#F8FAFC]' : 'border-[#E2E8F0] bg-white hover:bg-[#F8FAFC]'
                   }`}
                 >
-                  <FolderOpen className="w-5 h-5 stroke-[1.5] text-[#6B7280] mx-auto mb-1" />
-                  <span className="text-[13px] font-medium text-[#111827] block">
-                    {uploadingImage ? 'Uploading image...' : 'Click or drag image file here'}
+                  <FolderOpen className="w-4 h-4 text-[#64748B] mx-auto mb-1" />
+                  <span className="text-[13px] text-[#0F172A] block">
+                    {uploadingImage ? 'Uploading image...' : 'Click or drop image file here'}
                   </span>
-                  <span className="text-[11px] text-[#6B7280] block mt-0.5">
+                  <span className="text-[12px] text-[#64748B] block mt-0.5">
                     PNG, JPG, WEBP up to 10MB
                   </span>
                 </div>
-
-                {uploadError && (
-                  <p className="text-[12px] text-red-600 mt-1">{uploadError}</p>
-                )}
+                {uploadError && <p className="text-[12px] text-[#DC2626] mt-1">{uploadError}</p>}
               </div>
             ) : (
-              <div>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full h-9 px-3 text-[13px] rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
-                />
-              </div>
+              <input
+                type="url"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                placeholder="https://images.unsplash.com/..."
+                className="w-full h-[36px] px-3 text-[14px] rounded-[6px] border border-[#E2E8F0] bg-white text-[#0F172A] focus:outline-hidden focus:ring-1 focus:ring-[#2563EB]"
+              />
             )}
           </div>
 
           {/* Description */}
           <FormField
             id="event-description"
-            label="Event Description"
+            label="Event description"
             required
             error={errors.description}
             currentLength={formData.description.length}
@@ -542,18 +500,16 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               onChange={handleChange}
               maxLength={1000}
               placeholder="Provide event details, schedule highlights, and prerequisites..."
-              aria-invalid={Boolean(errors.description)}
-              aria-describedby={errors.description ? 'event-description-error' : undefined}
-              className={`w-full p-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors resize-y text-[#111827] placeholder:text-[#9CA3AF] ${
+              className={`w-full p-3 text-[14px] leading-[20px] rounded-[6px] border bg-white focus:outline-hidden transition-colors resize-y text-[#0F172A] placeholder:text-[#64748B] ${
                 errors.description
-                  ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
+                  ? 'border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]'
+                  : 'border-[#E2E8F0] focus:ring-1 focus:ring-[#2563EB] focus:border-[#2563EB]'
               }`}
             />
           </FormField>
 
           {/* Action Footer */}
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-[#E5E7EB]">
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-[#E2E8F0]">
             <Button
               variant="secondary"
               size="md"
@@ -567,10 +523,18 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               variant="primary"
               size="md"
               type="submit"
-              loading={submitting}
-              disabled={submitting || Object.keys(errors).length > 0}
+              disabled={submitting || !isFormValid}
             >
-              {isEditing ? 'Save Changes' : 'Create Event'}
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  <span>Saving...</span>
+                </>
+              ) : isEditing ? (
+                'Save changes'
+              ) : (
+                'Create event'
+              )}
             </Button>
           </div>
         </form>

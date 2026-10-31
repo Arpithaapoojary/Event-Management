@@ -1,11 +1,10 @@
 import React from 'react';
 
 /**
- * Enterprise Form Field Component
- * - Standardized typography (13px label, 12px helper/error)
- * - Accessible error messaging with role="alert" and id for aria-describedby
- * - Character count display
- * - 4/8px spacing scale
+ * Standard Design Token FormField Component (Linear / Stripe style)
+ * - 13px font-medium #0F172A label, required marked with * #DC2626
+ * - Helper text in muted gray #64748B
+ * - Inline error in red #DC2626
  */
 export default function FormField({
   id,
@@ -22,19 +21,19 @@ export default function FormField({
   const helperId = id ? `${id}-helper` : undefined;
 
   return (
-    <div className={`space-y-1.5 ${className}`}>
+    <div className={`space-y-1 ${className}`}>
       {/* Label and Character Count */}
       <div className="flex items-center justify-between">
         <label
           htmlFor={id}
-          className="block text-[13px] font-medium text-[#374151]"
+          className="block text-[13px] font-medium text-[#0F172A]"
         >
           {label}
-          {required && <span className="text-[#EF4444] ml-0.5">*</span>}
+          {required && <span className="text-[#DC2626] ml-0.5">*</span>}
         </label>
 
         {maxLength !== undefined && (
-          <span className="text-[11px] text-[#9CA3AF] tabular-nums">
+          <span className="text-[12px] text-[#64748B] tabular-nums">
             {currentLength || 0} / {maxLength}
           </span>
         )}
@@ -45,7 +44,7 @@ export default function FormField({
 
       {/* Helper text if no error */}
       {helperText && !error && (
-        <p id={helperId} className="text-[12px] text-[#6B7280]">
+        <p id={helperId} className="text-[12px] text-[#64748B]">
           {helperText}
         </p>
       )}
@@ -55,7 +54,7 @@ export default function FormField({
         <p
           id={errorId}
           role="alert"
-          className="text-[12px] text-red-600 font-medium flex items-center gap-1"
+          className="text-[12px] text-[#DC2626] font-normal"
         >
           {error}
         </p>

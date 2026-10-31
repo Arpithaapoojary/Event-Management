@@ -1,30 +1,29 @@
 import React from 'react';
 
 /**
- * Enterprise StatCard Component
- * - 12px radius max
- * - 1px border (#E5E7EB)
- * - Clean white background (#FFFFFF)
- * - No icons in colored boxes
- * - Label: small uppercase gray (11-12px, weight 500, letter-spacing 0.04em)
- * - Value: 28px, weight 600, tabular numbers
- * - Helper text: muted gray (13px, weight 400)
+ * Clean, Calm StatCard Component (Linear / Stripe / Vercel design)
+ * - White surface, 1px border #E2E8F0, 8px radius
+ * - 16-24px padding (p-4 sm:p-5)
+ * - Small gray label (12px), 28px/600 value with tabular-nums, one muted helper line
+ * - NO icons or colored icon boxes
  */
 export default function StatCard({ label, value, helperText, className = '' }) {
   return (
     <div
-      className={`bg-white rounded-[12px] border border-[#E5E7EB] p-5 transition-colors hover:border-[#D1D5DB] ${className}`}
+      className={`bg-white rounded-[8px] border border-[#E2E8F0] shadow-[0_1px_2px_rgba(0,0,0,0.05)] p-4 sm:p-5 flex flex-col justify-between ${className}`}
     >
-      <div className="text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">
+      <div className="text-[12px] leading-[16px] font-normal text-[#64748B]">
         {label}
       </div>
-      <div className="text-[28px] font-semibold text-[#111827] tabular-nums tracking-[-0.01em] leading-tight mt-1 mb-1">
+      <div className="text-[28px] leading-[36px] font-semibold text-[#0F172A] tabular-nums tracking-[-0.01em] my-1">
         {value}
       </div>
-      {helperText && (
-        <div className="text-[13px] text-[#6B7280] leading-normal font-normal">
+      {helperText ? (
+        <div className="text-[12px] leading-[16px] text-[#64748B] truncate">
           {helperText}
         </div>
+      ) : (
+        <div className="h-[16px]" />
       )}
     </div>
   );

@@ -13,6 +13,18 @@ export default {
         serif: ['Playfair Display', 'Cinzel', 'Georgia', 'serif'],
       },
       colors: {
+        admin: {
+          page: '#F8FAFC',
+          surface: '#FFFFFF',
+          border: '#E2E8F0',
+          text: '#0F172A',
+          muted: '#64748B',
+          primary: '#0F172A',
+          focus: '#2563EB',
+          success: '#16A34A',
+          warning: '#D97706',
+          danger: '#DC2626',
+        },
         maroon: {
           50: '#fbf4f5',
           100: '#f6e8ea',
