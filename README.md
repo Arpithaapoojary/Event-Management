@@ -193,12 +193,37 @@ Client will start on: **`http://localhost:5173`**
 | `createdAt` | Date | Timestamp |
 | **Index** | `{ event: 1, email: 1 }` | **Compound Unique Index** (Prevents duplicate registrations) |
 
-#### Approach to Deleted Events & Data Consistency
-When an administrator deletes an event, a **soft-deletion strategy** (`isDeleted: true`) is enforced. The event is hidden from the public catalog and search queries, but all associated attendee registrations and historical records remain intact in the database for auditing and reporting.
+#### Approach to Deleted Events & Data Consistency (Soft Delete Decision)
+EventFlow strictly adheres to an **institutional soft-deletion strategy**:
+- **Why Soft Delete?**: Hard-deleting events would sever foreign-key relationships, orphan student attendee tickets, destroy audit trails, and risk irreversible data loss if an event was deleted accidentally.
+- **Implementation**: Deleting an event sets `isDeleted: true` and records a `deletedAt` timestamp (with virtual status `'CANCELLED'`).
+- **Catalog & Stats Isolation**: Soft-deleted events are automatically excluded from the public student portal, from default admin event lists, and from active KPI metrics (`Total Events`, `Upcoming Events`, and active `Total Registrations`).
+- **Archival Integrity**: Student registrations associated with soft-deleted events are safely preserved, marked with a clear `Event deleted` archive label, and locked into read-only mode for audit compliance.
+- **Auditing & Restoration**: Institutional administrators can toggle `"Show Deleted"` in the Event Management table to audit deactivated events or restore an event with a single click via `POST /api/admin/events/:id/restore`.
+- **Capacity Safety**: Updating an event never detaches registrations; capacity validation guarantees that capacity cannot be reduced below the current number of confirmed attendees.
 
 ---
 
-## 10. Known Limitations & Future Enhancements
+## 10. Enterprise Architecture & Security Overview
+
+### 1. Authentication and Access Control Approach
+- **Server-Side Enforcement**: All administrative API endpoints (`/api/admin/*`) require server-side token verification via `adminAuth` middleware. Security is enforced on the backend, not solely by hiding UI buttons.
+- **401 Unauthorized vs. 403 Forbidden**:
+  - Missing token credentials immediately return `401 Unauthorized`, triggering automatic client-side session expiry redirection to `/admin/login?reason=expired`.
+  - Present but invalid or unauthorized tokens return `403 Forbidden`, routing the user to a dedicated enterprise 403 page (`/admin/forbidden`).
+- **User Session Menu**: Replaced consumer badges with an enterprise user menu displaying administrator avatar initials (`EC`), user role (`Coordinator / Administrator`), and a secure `Sign Out` action.
+
+### 2. Validation Rules (Client and Server)
+- **Field Whitelist & Whitespace**: Required fields (`title`, `description`, `dateTime`, `venue`, `capacity`) cannot be empty or whitespace-only.
+- **String Length Limits**: Title is restricted to a maximum of 120 characters; Description is restricted to a maximum of 1,000 characters. Character counters provide instant visual feedback.
+- **Date Guards**: Date and start time must be valid ISO dates. For newly created events, past dates are strictly rejected on both client and server.
+- **Headcount & Capacity Validation**: Capacity must be a positive integer (`>= 1`). When updating existing events, capacity cannot be reduced below the count of existing confirmed attendees (`registeredCount`).
+- **Accessible Inline Errors**: Form fields link error messages using `aria-describedby` and `role="alert"` in `text-red-600`. Submit buttons are disabled while form inputs are invalid or actively submitting.
+
+---
+
+## 11. Known Limitations & Future Enhancements
 - **QR Code Check-In**: Generating scannable QR tickets for physical event check-in.
 - **Automated Email Confirmation**: Integrating Nodemailer / SendGrid for email ticket confirmations.
 - **Waitlist Support**: Adding automatic waitlists when an event reaches maximum capacity.
+

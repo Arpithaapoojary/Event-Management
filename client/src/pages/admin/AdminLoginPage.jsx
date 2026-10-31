@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   ShieldCheck,
   KeyRound,
@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Loader2,
-  Sparkles,
   Eye,
   EyeOff,
   CheckCircle2,
@@ -15,10 +14,15 @@ import {
 import api from '../../api/client';
 
 export default function AdminLoginPage() {
+  const [searchParams] = useSearchParams();
+  const isSessionExpired = searchParams.get('reason') === 'expired';
+
   const [passcode, setPasscode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(
+    isSessionExpired ? 'Session expired. Please enter administrative passcode to log in again.' : null
+  );
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -45,10 +49,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  const fillDemoPasscode = () => {
-    setPasscode('admin2026');
-    if (error) setError(null);
-  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-slate-50/70 px-4 py-12 font-sans selection:bg-slate-200">
@@ -130,17 +130,10 @@ export default function AdminLoginPage() {
                   </button>
                 </div>
 
-                {/* Quick Demo Autofill Chip */}
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <button
-                    type="button"
-                    onClick={fillDemoPasscode}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer active:scale-95"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Auto-fill Demo: <strong>admin2026</strong></span>
-                  </button>
-                  <span className="text-xs text-slate-500 font-medium">Secured Session</span>
+                {/* Security hint */}
+                <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
+                  <span>Enter administrative coordinator credentials</span>
+                  <span className="text-xs text-slate-400 font-medium">Secured Session</span>
                 </div>
               </div>
 

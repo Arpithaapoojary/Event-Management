@@ -29,6 +29,10 @@ exports.getAdminStats = async (req, res, next) => {
   try {
     const now = new Date();
 
+    // 1. Fetch all active non-deleted events for registration counting
+    const activeEvents = await Event.find({ isDeleted: false }).select('_id');
+    const activeEventIds = activeEvents.map((e) => e._id);
+
     const [
       totalEvents,
       totalRegistrations,
@@ -38,9 +42,10 @@ exports.getAdminStats = async (req, res, next) => {
       culturalEvents,
       technicalEvents,
       sportsEvents,
+      deletedEvents,
     ] = await Promise.all([
       Event.countDocuments({ isDeleted: false }),
-      Registration.countDocuments(),
+      Registration.countDocuments({ event: { $in: activeEventIds } }),
       Event.countDocuments({ isDeleted: false, dateTime: { $gte: now } }),
       Event.countDocuments({ isDeleted: false, dateTime: { $lt: now } }),
       Event.countDocuments({
@@ -50,6 +55,7 @@ exports.getAdminStats = async (req, res, next) => {
       Event.countDocuments({ isDeleted: false, category: 'Cultural' }),
       Event.countDocuments({ isDeleted: false, category: 'Technical' }),
       Event.countDocuments({ isDeleted: false, category: 'Sports' }),
+      Event.countDocuments({ isDeleted: true }),
     ]);
 
     res.status(200).json({
@@ -60,12 +66,59 @@ exports.getAdminStats = async (req, res, next) => {
         upcomingEvents,
         pastEvents,
         fullEvents,
+        deletedEvents,
         categories: {
           cultural: culturalEvents,
           technical: technicalEvents,
           sports: sportsEvents,
         },
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get admin events with soft-delete filter support (Module 4)
+// @route   GET /api/admin/events
+// @access  Private (Admin)
+exports.getAdminEvents = async (req, res, next) => {
+  try {
+    const { showDeleted, category, search, status } = req.query;
+    let query = {};
+
+    if (showDeleted === 'true') {
+      // Show all events including soft-deleted for audit
+    } else if (showDeleted === 'only') {
+      query.isDeleted = true;
+    } else {
+      query.isDeleted = false;
+    }
+
+    if (category && category.toLowerCase() !== 'all') {
+      query.category = new RegExp(`^${category}$`, 'i');
+    }
+
+    if (search && search.trim() !== '') {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      query.$or = [{ title: searchRegex }, { venue: searchRegex }, { description: searchRegex }];
+    }
+
+    const now = new Date();
+    if (status === 'upcoming') {
+      query.dateTime = { $gte: now };
+    } else if (status === 'past') {
+      query.dateTime = { $lt: now };
+    } else if (status === 'cancelled') {
+      query.isDeleted = true;
+    }
+
+    const events = await Event.find(query).sort({ dateTime: 1 });
+
+    res.status(200).json({
+      success: true,
+      count: events.length,
+      data: events,
     });
   } catch (error) {
     next(error);
@@ -79,11 +132,26 @@ exports.createEvent = async (req, res, next) => {
   try {
     const { title, description, dateTime, venue, capacity, imageUrl, category } = req.body;
 
-    // Field validations
-    if (!title || !description || !dateTime || !venue || capacity === undefined) {
+    // Field presence & whitespace validation
+    if (!title || !title.trim() || !description || !description.trim() || !dateTime || !venue || !venue.trim() || capacity === undefined) {
       return res.status(400).json({
         success: false,
-        message: 'Title, description, date & time, venue, and capacity are all required.',
+        message: 'Title, description, date & time, venue, and capacity are all required and cannot be empty.',
+      });
+    }
+
+    // Length constraints (120 for title, 1000 for description)
+    if (title.trim().length > 120) {
+      return res.status(400).json({
+        success: false,
+        message: 'Event title cannot exceed 120 characters.',
+      });
+    }
+
+    if (description.trim().length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Event description cannot exceed 1000 characters.',
       });
     }
 
@@ -95,10 +163,20 @@ exports.createEvent = async (req, res, next) => {
       });
     }
 
-    if (Number(capacity) < 1) {
+    // Date must be in the future for new events
+    if (eventDate <= new Date()) {
       return res.status(400).json({
         success: false,
-        message: 'Capacity must be at least 1 seat.',
+        message: 'Event date must be in the future. Past dates cannot be scheduled.',
+      });
+    }
+
+    // Capacity must be positive integer
+    const parsedCapacity = Number(capacity);
+    if (!Number.isInteger(parsedCapacity) || parsedCapacity < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Capacity must be a positive integer (at least 1 seat).',
       });
     }
 
@@ -107,7 +185,7 @@ exports.createEvent = async (req, res, next) => {
       description: description.trim(),
       dateTime: eventDate,
       venue: venue.trim(),
-      capacity: Number(capacity),
+      capacity: parsedCapacity,
       category: category && ['Cultural', 'Technical', 'Sports', 'Other'].includes(category) ? category : 'Cultural',
       imageUrl:
         imageUrl && imageUrl.trim() !== ''
@@ -140,26 +218,45 @@ exports.updateEvent = async (req, res, next) => {
       });
     }
 
-    // Validate capacity if changed: cannot be less than existing registrations
+    // Length constraints
+    if (title !== undefined) {
+      if (!title.trim()) {
+        return res.status(400).json({ success: false, message: 'Event title cannot be empty.' });
+      }
+      if (title.trim().length > 120) {
+        return res.status(400).json({ success: false, message: 'Event title cannot exceed 120 characters.' });
+      }
+      event.title = title.trim();
+    }
+
+    if (description !== undefined) {
+      if (!description.trim()) {
+        return res.status(400).json({ success: false, message: 'Event description cannot be empty.' });
+      }
+      if (description.trim().length > 1000) {
+        return res.status(400).json({ success: false, message: 'Event description cannot exceed 1000 characters.' });
+      }
+      event.description = description.trim();
+    }
+
+    // Validate capacity: must be integer and cannot be less than current registrations
     if (capacity !== undefined) {
       const parsedCapacity = Number(capacity);
-      if (parsedCapacity < 1) {
+      if (!Number.isInteger(parsedCapacity) || parsedCapacity < 1) {
         return res.status(400).json({
           success: false,
-          message: 'Capacity must be at least 1 seat.',
+          message: 'Capacity must be a positive integer.',
         });
       }
-      if (parsedCapacity < event.registeredCount) {
+      if (parsedCapacity < (event.registeredCount || 0)) {
         return res.status(400).json({
           success: false,
-          message: `Cannot reduce capacity below existing registered attendees (${event.registeredCount}).`,
+          message: `Cannot reduce capacity below existing registered attendees (${event.registeredCount || 0}).`,
         });
       }
       event.capacity = parsedCapacity;
     }
 
-    if (title) event.title = title.trim();
-    if (description) event.description = description.trim();
     if (dateTime) {
       const eventDate = new Date(dateTime);
       if (isNaN(eventDate.getTime())) {
@@ -170,10 +267,18 @@ exports.updateEvent = async (req, res, next) => {
       }
       event.dateTime = eventDate;
     }
-    if (venue) event.venue = venue.trim();
+
+    if (venue) {
+      if (!venue.trim()) {
+        return res.status(400).json({ success: false, message: 'Campus venue location cannot be empty.' });
+      }
+      event.venue = venue.trim();
+    }
+
     if (category && ['Cultural', 'Technical', 'Sports', 'Other'].includes(category)) {
       event.category = category;
     }
+
     if (imageUrl !== undefined) {
       event.imageUrl = imageUrl.trim() !== '' ? imageUrl.trim() : event.imageUrl;
     }
@@ -206,12 +311,45 @@ exports.deleteEvent = async (req, res, next) => {
 
     // Soft delete to ensure registration data remains consistent and intact for audits
     event.isDeleted = true;
+    event.deletedAt = new Date();
     await event.save();
 
     res.status(200).json({
       success: true,
-      message: 'Event has been deleted successfully. Associated registrations are preserved.',
-      data: { id: event._id },
+      message: `Event "${event.title}" has been deleted. ${event.registeredCount || 0} registrations preserved in archive.`,
+      data: {
+        id: event._id,
+        affectedRegistrations: event.registeredCount || 0,
+        deletedAt: event.deletedAt,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Restore a soft-deleted event (Module 4)
+// @route   POST /api/admin/events/:id/restore
+// @access  Private (Admin)
+exports.restoreEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findOne({ _id: req.params.id, isDeleted: true });
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: 'Soft-deleted event not found or is already active.',
+      });
+    }
+
+    event.isDeleted = false;
+    event.deletedAt = null;
+    await event.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Event "${event.title}" has been restored successfully.`,
+      data: event,
     });
   } catch (error) {
     next(error);
@@ -236,7 +374,7 @@ exports.getRegistrations = async (req, res, next) => {
     }
 
     const registrations = await Registration.find(query)
-      .populate('event', 'title dateTime venue isDeleted')
+      .populate('event', 'title dateTime venue isDeleted category capacity registeredCount')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -277,9 +415,15 @@ exports.getEventRegistrations = async (req, res, next) => {
       success: true,
       event: {
         id: event._id,
+        _id: event._id,
         title: event.title,
         capacity: event.capacity,
         registeredCount: event.registeredCount,
+        category: event.category,
+        venue: event.venue,
+        dateTime: event.dateTime,
+        seatsLeft: event.seatsLeft,
+        status: event.status,
       },
       count: registrations.length,
       data: registrations,

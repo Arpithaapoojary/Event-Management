@@ -17,13 +17,14 @@ exports.getEvents = async (req, res, next) => {
       query.category = new RegExp(`^${category}$`, 'i');
     }
 
-    // Search by title, description, or venue
+    // Search by title, description, venue, or category
     if (search && search.trim() !== '') {
       const searchRegex = new RegExp(search.trim(), 'i');
       query.$or = [
         { title: searchRegex },
         { description: searchRegex },
         { venue: searchRegex },
+        { category: searchRegex },
       ];
     }
 

@@ -173,8 +173,11 @@ export default function EventDetailPage() {
               </span>
             </div>
 
-            {/* Official Pass pill in Bottom Left */}
-            <div className="absolute bottom-4 left-4 z-10">
+            {/* Category and Official Pass pill in Bottom Left */}
+            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 flex-wrap">
+              <span className="bg-slate-950 text-white font-extrabold text-xs px-4 py-2 rounded-full shadow-md uppercase tracking-wider">
+                {event.category || 'Cultural'}
+              </span>
               <span className="bg-slate-950/85 backdrop-blur-md text-white font-extrabold text-xs px-4 py-2 rounded-full shadow-md inline-flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 <span>Verified Campus Event</span>
@@ -182,8 +185,12 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          {/* Super-Kicker */}
-          <div className="mb-2">
+          {/* Super-Kicker with Category */}
+          <div className="mb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-black tracking-[0.2em] uppercase text-indigo-600 font-sans">
+              {event.category || 'Cultural'} ARENA
+            </span>
+            <span className="text-slate-300">•</span>
             <span className="text-xs font-bold tracking-[0.15em] uppercase text-slate-500 font-sans">
               EVENT DETAILS &amp; PASS REGISTRATION
             </span>

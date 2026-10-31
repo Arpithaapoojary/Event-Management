@@ -41,10 +41,15 @@ export default function EventCard({ event }) {
 
       {/* Card Content & Action Bar - Centered matching main cards */}
       <div className="relative z-10 text-center flex flex-col items-center">
-        {/* Bright Golden-Yellow Pill Badge */}
-        <span className="bg-[#FFC700] text-slate-950 font-black text-xs px-4 py-1.5 rounded-full inline-block mb-2.5 shadow-xs uppercase tracking-wider">
-          {badgeText}
-        </span>
+        {/* Category & Status Badges */}
+        <div className="flex items-center gap-2 mb-2.5 flex-wrap justify-center">
+          <span className="bg-slate-950 text-white font-extrabold text-[11px] px-3.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
+            {event.category || 'Cultural'}
+          </span>
+          <span className="bg-[#FFC700] text-slate-950 font-black text-[11px] px-3.5 py-1 rounded-full inline-block shadow-xs uppercase tracking-wider">
+            {badgeText}
+          </span>
+        </div>
 
         {/* Bold Display Card Title */}
         <h3 className="text-2xl sm:text-[25px] font-black font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors line-clamp-1 w-full px-1">

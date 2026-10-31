@@ -5,9 +5,11 @@ const upload = require('../middleware/upload');
 const {
   adminLogin,
   getAdminStats,
+  getAdminEvents,
   createEvent,
   updateEvent,
   deleteEvent,
+  restoreEvent,
   getRegistrations,
   getEventRegistrations,
 } = require('../controllers/adminController');
@@ -39,8 +41,9 @@ router.post('/upload', upload.single('image'), (req, res) => {
 router.get('/stats', getAdminStats);
 
 // Module 4: Event CRUD operations
-router.route('/events').post(createEvent);
+router.route('/events').get(getAdminEvents).post(createEvent);
 router.route('/events/:id').put(updateEvent).delete(deleteEvent);
+router.post('/events/:id/restore', restoreEvent);
 
 // Module 5: Registration management
 router.get('/registrations', getRegistrations);

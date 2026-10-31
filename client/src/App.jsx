@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import EventDetailPage from './pages/EventDetailPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import Forbidden403Page from './pages/admin/Forbidden403Page';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
 
             {/* Admin Portal (Module 3, 4, 5) */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/forbidden" element={<Forbidden403Page />} />
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
 

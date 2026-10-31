@@ -78,6 +78,7 @@ export default function HomePage() {
   // Search and Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'upcoming' | 'open' | 'past'
+  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all' | 'cultural' | 'technical' | 'sports'
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState(null);
 
   const fetchEvents = async () => {
@@ -97,6 +98,11 @@ export default function HomePage() {
     fetchEvents();
   }, []);
 
+  // Category counts
+  const culturalCount = events.filter((e) => (e.category || '').toLowerCase() === 'cultural').length;
+  const technicalCount = events.filter((e) => (e.category || '').toLowerCase() === 'technical').length;
+  const sportsCount = events.filter((e) => (e.category || '').toLowerCase() === 'sports').length;
+
   // Smooth scroll helper
   const scrollToSection = (elementId) => {
     const el = document.getElementById(elementId);
@@ -107,38 +113,63 @@ export default function HomePage() {
 
   // Handler when user selects a category card
   const handleSelectCategory = (keyword, filterKeywords = []) => {
-    setSelectedCategoryFilter({ keyword, filterKeywords });
-    setSearchQuery(keyword);
+    const catLower = keyword.toLowerCase();
+    setSelectedCategory(catLower);
+    setSelectedCategoryFilter({ keyword: catLower, filterKeywords });
+    setSearchQuery('');
     setActiveTab('all');
     scrollToSection('events-directory');
   };
 
   const handleClearFilter = () => {
+    setSelectedCategory('all');
     setSelectedCategoryFilter(null);
     setSearchQuery('');
   };
 
   // Filter and search logic
   const filteredEvents = events.filter((event) => {
-    // 1. Tab filter
+    // 1. Tab filter (status)
     if (activeTab === 'upcoming' && event.status === 'PAST') return false;
     if (activeTab === 'open' && event.status !== 'UPCOMING') return false;
     if (activeTab === 'past' && event.status !== 'PAST') return false;
 
-    // 2. Search query filter
+    const eventCategory = (event.category || 'Cultural').toLowerCase();
+
+    // 2. Category filter
+    if (selectedCategory && selectedCategory !== 'all') {
+      const isDirectMatch = eventCategory === selectedCategory.toLowerCase();
+      const keywords = selectedCategoryFilter?.filterKeywords || [];
+      const isKeywordMatch = keywords.some(
+        (k) =>
+          (event.title || '').toLowerCase().includes(k) ||
+          (event.venue || '').toLowerCase().includes(k) ||
+          (event.description || '').toLowerCase().includes(k)
+      );
+      if (!isDirectMatch && !isKeywordMatch) {
+        return false;
+      }
+    }
+
+    // 3. Search query filter
     if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase().trim();
       const title = (event.title || '').toLowerCase();
       const venue = (event.venue || '').toLowerCase();
       const desc = (event.description || '').toLowerCase();
 
-      // Check direct match
-      if (title.includes(q) || venue.includes(q) || desc.includes(q)) {
-        return true;
-      }
+      // Check title, venue, description, OR category!
+      const matchDirect =
+        title.includes(q) ||
+        venue.includes(q) ||
+        desc.includes(q) ||
+        eventCategory.includes(q);
+
+      if (matchDirect) return true;
 
       // Check category keywords if selected via card
-      if (selectedCategoryFilter && selectedCategoryFilter.keyword === searchQuery) {
+      if (selectedCategoryFilter && selectedCategoryFilter.keyword === q) {
+        if (eventCategory === q) return true;
         const keywords = selectedCategoryFilter.filterKeywords || [];
         const matchesCategory = keywords.some(
           (k) => title.includes(k) || venue.includes(k) || desc.includes(k)
@@ -285,15 +316,18 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Selected Category Filter Banner (if user filtered via category card) */}
-        {selectedCategoryFilter && (
+        {/* Selected Category Filter Banner (if user filtered via category card or pill) */}
+        {selectedCategory !== 'all' && (
           <div className="mb-8 p-4 rounded-3xl bg-white border border-slate-200/80 flex items-center justify-between shadow-xs animate-hero-fade-in">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-sm font-bold text-slate-900">
-                Filtered by category:{' '}
+                Filtered by category arena:{' '}
                 <span className="font-extrabold capitalize text-slate-950">
-                  {selectedCategoryFilter.keyword} Events
+                  {selectedCategory} Events
+                </span>
+                <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                  {filteredEvents.length} events
                 </span>
               </span>
             </div>
@@ -301,65 +335,99 @@ export default function HomePage() {
               onClick={handleClearFilter}
               className="text-xs font-extrabold text-slate-700 hover:text-slate-950 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
-              Clear Filter ✕
+              Show All Arenas ✕
             </button>
           </div>
         )}
 
         {/* Tabs and Quick Search Filter Bar */}
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between mb-10">
-          {/* Status Tabs */}
-          <div className="flex items-center gap-1 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto shrink-0 max-w-full">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'all'
-                  ? 'bg-slate-950 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-950'
-              }`}
-            >
-              All Events
-            </button>
-            <button
-              onClick={() => setActiveTab('upcoming')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'upcoming'
-                  ? 'bg-slate-950 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-950'
-              }`}
-            >
-              Upcoming
-            </button>
-            <button
-              onClick={() => setActiveTab('open')}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'open'
-                  ? 'bg-slate-950 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-950'
-              }`}
-            >
-              Registration Open
-            </button>
+        <div className="flex flex-col gap-5 mb-10">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+            {/* Arena Category Pills */}
+            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto shrink-0 max-w-full">
+              {[
+                { id: 'all', label: 'All Arenas', count: events.length },
+                { id: 'cultural', label: 'Cultural', count: culturalCount },
+                { id: 'technical', label: 'Technical', count: technicalCount },
+                { id: 'sports', label: 'Sports', count: sportsCount },
+              ].map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setSelectedCategory(cat.id);
+                      if (cat.id === 'all') {
+                        setSelectedCategoryFilter(null);
+                      } else {
+                        const card = CATEGORY_CARDS.find((c) => c.id === cat.id);
+                        setSelectedCategoryFilter(
+                          card ? { keyword: card.searchKeyword, filterKeywords: card.filterKeywords } : null
+                        );
+                      }
+                    }}
+                    className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+                      isSelected
+                        ? 'bg-slate-950 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-950'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    <span
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                        isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {cat.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search Input Box */}
+            <div className="relative w-full lg:w-80 shrink-0">
+              <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by event, category, venue..."
+                className="w-full pl-11 pr-10 py-2.5 rounded-full bg-white border border-slate-200/90 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-slate-950 text-slate-900 shadow-2xs placeholder-slate-400"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Search Input Box */}
-          <div className="relative w-full lg:w-80 shrink-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by event, title, venue..."
-              className="w-full pl-11 pr-10 py-2.5 rounded-full bg-white border border-slate-200/90 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-slate-950 text-slate-900 shadow-2xs placeholder-slate-400"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
-              >
-                ✕
-              </button>
-            )}
+          {/* Secondary Status Tabs */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Status:</span>
+            <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-slate-200/60 w-fit">
+              {[
+                { id: 'all', label: 'All Status' },
+                { id: 'upcoming', label: 'Upcoming' },
+                { id: 'open', label: 'Registration Open' },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  onClick={() => setActiveTab(st.id)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === st.id
+                      ? 'bg-slate-950 text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

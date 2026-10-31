@@ -1,4 +1,4 @@
-// Middleware to restrict administrative access
+// Middleware to restrict administrative access with 401 (Unauthorized) and 403 (Forbidden) handling
 const adminAuth = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const adminKey = req.headers['x-admin-key'];
@@ -11,10 +11,19 @@ const adminAuth = (req, res, next) => {
     token = adminKey;
   }
 
-  if (!token || token !== expectedKey) {
+  // 1. Missing authentication credentials -> 401 Unauthorized (redirect to login)
+  if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Access denied: Valid administrative credentials or passcode required.',
+      message: 'Authentication required. No administrative session token provided. Please log in.',
+    });
+  }
+
+  // 2. Token provided but does not match expected admin credentials -> 403 Forbidden (403 page)
+  if (token !== expectedKey) {
+    return res.status(403).json({
+      success: false,
+      message: 'Access forbidden: Administrative privileges required. You do not have permission to access this resource.',
     });
   }
 
@@ -22,3 +31,4 @@ const adminAuth = (req, res, next) => {
 };
 
 module.exports = adminAuth;
+

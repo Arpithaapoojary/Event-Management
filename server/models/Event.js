@@ -50,6 +50,10 @@ const EventSchema = new mongoose.Schema(
       default: false,
       index: true,
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -60,6 +64,10 @@ const EventSchema = new mongoose.Schema(
 
 // Virtual property to calculate dynamic status
 EventSchema.virtual('status').get(function () {
+  if (this.isDeleted) {
+    return 'CANCELLED';
+  }
+
   const now = new Date();
   const eventTime = new Date(this.dateTime);
 
