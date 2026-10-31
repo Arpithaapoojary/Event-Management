@@ -3,6 +3,7 @@ import { X, Calendar, MapPin, Users, Edit2, Eye, RotateCcw, ExternalLink } from 
 import { Link } from 'react-router-dom';
 import { StatusBadge, CategoryBadge } from './Badge';
 import Button from './Button';
+import { resolveImageUrl, FALLBACK_EVENT_IMAGE } from '../../../utils/imageUrl';
 
 /**
  * Enterprise Event Detail Drawer
@@ -119,12 +120,11 @@ export default function EventDetailDrawer({
             {/* Thumbnail banner */}
             <div className="w-full h-44 rounded-[8px] overflow-hidden border border-[#E5E7EB] bg-[#F3F4F6] relative">
               <img
-                src={event.imageUrl}
+                src={resolveImageUrl(event.imageUrl)}
                 alt=""
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src =
-                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80';
+                  e.target.src = FALLBACK_EVENT_IMAGE;
                 }}
                 className="w-full h-full object-cover"
               />

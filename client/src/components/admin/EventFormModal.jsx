@@ -3,12 +3,70 @@ import {
   X,
   Loader2,
   FolderOpen,
+  CheckCircle2,
+  Trash2,
+  RefreshCw,
+  Image as ImageIcon,
+  Link as LinkIcon,
 } from 'lucide-react';
 import api from '../../api/client';
 import { Button, FormField } from './enterprise';
+import { resolveImageUrl, FALLBACK_EVENT_IMAGE } from '../../utils/imageUrl';
 
-const FALLBACK_PREVIEW =
-  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80';
+const CAMPUS_PRESETS = [
+  {
+    name: '🎭 Cultural & Dance',
+    url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    name: '💻 Tech Hackathon',
+    url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    name: '⚽ Sports Arena',
+    url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    name: '🎵 Music Fusion',
+    url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    name: '🤖 Robotics & Drone',
+    url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
+// Client-side lightweight canvas compressor (< 250KB WebP/JPEG)
+const compressImageFile = (file, maxWidth = 1200, quality = 0.85) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
 
 export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
   const isEditing = Boolean(event && event._id);
@@ -70,7 +128,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         dateTime: formatDateTimeForInput(tomorrow.toISOString()),
         venue: '',
         capacity: 50,
-        imageUrl: FALLBACK_PREVIEW,
+        imageUrl: CAMPUS_PRESETS[0].url,
         category: 'Cultural',
       });
       setImageMode('upload');
@@ -89,29 +147,26 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      setUploadError('Image size exceeds 10MB limit. Please choose a smaller image.');
+    if (file.size > 15 * 1024 * 1024) {
+      setUploadError('Image size exceeds 15MB limit. Please choose a smaller image.');
       return;
     }
 
     setUploadError(null);
+    setUploadingImage(true);
 
-    // Instant local preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setFormData((prev) => ({ ...prev, imageUrl: e.target.result }));
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to backend /api/admin/upload
     try {
-      setUploadingImage(true);
+      // 1. Instant client-side optimized preview (< 200KB)
+      const compressedDataUrl = await compressImageFile(file);
+      setFormData((prev) => ({ ...prev, imageUrl: compressedDataUrl }));
+
+      // 2. Also upload file to backend server storage if online
       const data = new FormData();
       data.append('image', file);
 
       const res = await api.post('/admin/upload', data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': undefined,
         },
       });
 
@@ -119,7 +174,7 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
         setFormData((prev) => ({ ...prev, imageUrl: res.imageUrl }));
       }
     } catch (err) {
-      console.warn('Backend file upload fallback to local preview data:', err);
+      console.warn('Backend file upload fallback to optimized local data URL:', err);
     } finally {
       setUploadingImage(false);
     }
@@ -415,18 +470,19 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
             </FormField>
           </div>
 
-          {/* Banner Image (File upload or URL) */}
-          <div className="space-y-1">
+          {/* Banner Image (File upload, Presets, or Web URL) */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-[13px] font-medium text-[#0F172A]">
-                Event banner image
+              <label className="text-[13px] font-medium text-[#0F172A] flex items-center gap-1.5">
+                <span>Event banner photo</span>
+                <span className="text-[11px] text-[#64748B] font-normal">(displayed on lineup & passes)</span>
               </label>
               <div className="inline-flex rounded-[6px] border border-[#E2E8F0] p-0.5 bg-[#F8FAFC]">
                 <button
                   type="button"
                   onClick={() => setImageMode('upload')}
-                  className={`px-2 py-0.5 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
-                    imageMode === 'upload' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B]'
+                  className={`px-2.5 py-1 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
+                    imageMode === 'upload' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B] hover:text-[#0F172A]'
                   }`}
                 >
                   Upload file
@@ -434,8 +490,8 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
                 <button
                   type="button"
                   onClick={() => setImageMode('url')}
-                  className={`px-2 py-0.5 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
-                    imageMode === 'url' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B]'
+                  className={`px-2.5 py-1 text-[12px] font-medium rounded-[4px] transition-colors cursor-pointer ${
+                    imageMode === 'url' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B] hover:text-[#0F172A]'
                   }`}
                 >
                   Web URL
@@ -443,44 +499,129 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
               </div>
             </div>
 
-            {imageMode === 'upload' ? (
+            {/* Live Banner Preview when an image is present */}
+            {formData.imageUrl ? (
+              <div className="relative rounded-[8px] overflow-hidden border border-[#E2E8F0] bg-slate-950 group">
+                <div className="h-36 w-full overflow-hidden relative">
+                  <img
+                    src={resolveImageUrl(formData.imageUrl)}
+                    alt="Event banner preview"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = FALLBACK_EVENT_IMAGE;
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-1.5 rounded-[6px] bg-white text-slate-900 text-[12px] font-medium shadow-xs hover:bg-slate-100 transition flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Change photo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, imageUrl: '' }))}
+                      className="px-3 py-1.5 rounded-[6px] bg-rose-600 text-white text-[12px] font-medium shadow-xs hover:bg-rose-700 transition flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <div className="px-3 py-2 bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between text-[12px]">
+                  <span className="flex items-center gap-1.5 font-medium text-emerald-700">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    Photo attached & preview ready
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-[#2563EB] hover:underline font-medium cursor-pointer"
+                  >
+                    Select different photo
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileInputChange}
+              accept="image/png, image/jpeg, image/jpg, image/webp"
+              className="hidden"
+            />
+
+            {/* Upload Mode Dropzone (shown if no image or to add new) */}
+            {imageMode === 'upload' && !formData.imageUrl && (
               <div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileInputChange}
-                  accept="image/png, image/jpeg, image/jpg, image/webp"
-                  className="hidden"
-                />
                 <div
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border border-dashed rounded-[6px] p-3 text-center cursor-pointer transition-colors ${
-                    isDragging ? 'border-[#0F172A] bg-[#F8FAFC]' : 'border-[#E2E8F0] bg-white hover:bg-[#F8FAFC]'
+                  className={`border-2 border-dashed rounded-[8px] p-5 text-center cursor-pointer transition-colors ${
+                    isDragging ? 'border-slate-950 bg-[#F8FAFC]' : 'border-[#E2E8F0] bg-white hover:bg-[#F8FAFC]'
                   }`}
                 >
-                  <FolderOpen className="w-4 h-4 text-[#64748B] mx-auto mb-1" />
-                  <span className="text-[13px] text-[#0F172A] block">
-                    {uploadingImage ? 'Uploading image...' : 'Click or drop image file here'}
+                  <FolderOpen className="w-6 h-6 text-[#64748B] mx-auto mb-1.5" />
+                  <span className="text-[13px] font-medium text-[#0F172A] block">
+                    {uploadingImage ? 'Processing & uploading photo...' : 'Click to browse or drop event photo here'}
                   </span>
                   <span className="text-[12px] text-[#64748B] block mt-0.5">
-                    PNG, JPG, WEBP up to 10MB
+                    PNG, JPG, JPEG, WEBP (auto-optimized for web)
                   </span>
                 </div>
-                {uploadError && <p className="text-[12px] text-[#DC2626] mt-1">{uploadError}</p>}
               </div>
-            ) : (
-              <input
-                type="url"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full h-[36px] px-3 text-[14px] rounded-[6px] border border-[#E2E8F0] bg-white text-[#0F172A] focus:outline-hidden focus:ring-1 focus:ring-[#2563EB]"
-              />
             )}
+
+            {/* Web URL Mode */}
+            {imageMode === 'url' && (
+              <div className="space-y-2">
+                <input
+                  type="url"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleChange}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full h-[38px] px-3 text-[14px] rounded-[6px] border border-[#E2E8F0] bg-white text-[#0F172A] focus:outline-hidden focus:ring-1 focus:ring-[#2563EB]"
+                />
+              </div>
+            )}
+
+            {uploadError && (
+              <p className="text-[12px] text-[#DC2626] font-medium mt-1">{uploadError}</p>
+            )}
+
+            {/* 1-Click Campus Theme Presets */}
+            <div className="pt-1">
+              <span className="text-[11px] font-medium text-[#64748B] block mb-1.5">
+                Or pick a 1-click campus theme photo:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {CAMPUS_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, imageUrl: preset.url }));
+                      if (uploadError) setUploadError(null);
+                    }}
+                    className={`text-[11px] font-medium px-2.5 py-1 rounded-[6px] border transition-colors cursor-pointer ${
+                      formData.imageUrl === preset.url
+                        ? 'border-slate-900 bg-slate-900 text-white'
+                        : 'border-[#E2E8F0] bg-white hover:bg-[#F1F5F9] text-[#334155]'
+                    }`}
+                  >
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Description */}

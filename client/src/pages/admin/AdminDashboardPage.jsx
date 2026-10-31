@@ -30,6 +30,7 @@ import {
 } from '../../components/admin/enterprise';
 import EventFormModal from '../../components/admin/EventFormModal';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+import { resolveImageUrl, FALLBACK_EVENT_IMAGE } from '../../utils/imageUrl';
 
 /**
  * EventFlow Admin Dashboard (Linear / Stripe / Vercel layout)
@@ -494,12 +495,11 @@ export default function AdminDashboardPage() {
                     >
                       <div className="min-w-0 flex items-center gap-3">
                         <img
-                          src={ev.imageUrl}
+                          src={resolveImageUrl(ev.imageUrl)}
                           alt=""
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src =
-                              'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+                            e.target.src = FALLBACK_EVENT_IMAGE;
                           }}
                           className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
                         />
@@ -731,12 +731,11 @@ export default function AdminDashboardPage() {
                         <TableCell className="w-[330px] max-w-[330px] overflow-hidden">
                           <div className="flex items-center gap-3 w-full min-w-0">
                             <img
-                              src={ev.imageUrl}
+                              src={resolveImageUrl(ev.imageUrl)}
                               alt=""
                               onError={(e) => {
                                 e.target.onerror = null;
-                                e.target.src =
-                                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+                                e.target.src = FALLBACK_EVENT_IMAGE;
                               }}
                               className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
                             />

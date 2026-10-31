@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80';
+import { resolveImageUrl, FALLBACK_EVENT_IMAGE } from '../../utils/imageUrl';
 
 export default function EventCard({ event }) {
   // Format Date and Time
@@ -28,11 +28,11 @@ export default function EventCard({ event }) {
       {/* 180px Image Container with 12px radius */}
       <div className="relative w-full h-[180px] rounded-[12px] overflow-hidden bg-slate-100 mb-3 shrink-0">
         <img
-          src={event.imageUrl}
+          src={resolveImageUrl(event.imageUrl)}
           alt={event.title}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = FALLBACK_IMAGE;
+            e.target.src = FALLBACK_EVENT_IMAGE;
           }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
           loading="lazy"

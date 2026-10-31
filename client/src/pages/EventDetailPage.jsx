@@ -13,8 +13,7 @@ import {
 } from 'lucide-react';
 import api from '../api/client';
 import RegistrationModal from '../components/events/RegistrationModal';
-
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80';
+import { resolveImageUrl, FALLBACK_EVENT_IMAGE } from '../utils/imageUrl';
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -151,11 +150,11 @@ export default function EventDetailPage() {
           {/* Hero Banner Container */}
           <div className="relative h-56 sm:h-64 lg:h-72 w-full rounded-[12px] overflow-hidden bg-slate-950 mb-5 shadow-2xs group">
             <img
-              src={event.imageUrl}
+              src={resolveImageUrl(event.imageUrl)}
               alt={event.title}
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = FALLBACK_IMAGE;
+                e.target.src = FALLBACK_EVENT_IMAGE;
               }}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
