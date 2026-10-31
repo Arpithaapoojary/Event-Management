@@ -188,54 +188,54 @@ export default function HomePage() {
       {/* ======================================================== */}
       {/* 1. HERO SECTION WITH EVENT LINEUP & SIGNATURE 3 CARDS */}
       {/* ======================================================== */}
-      <section className="relative pt-10 sm:pt-14 pb-14 sm:pb-18 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Section Header - Exact matching layout from user's reference */}
-          <div className="mb-10 sm:mb-12">
+          <div className="mb-6 sm:mb-8">
             {/* Super-Kicker */}
-            <div className="mb-3">
-              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.25em] uppercase text-slate-500 font-display break-words">
+            <div className="mb-2">
+              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase text-slate-500 font-display break-words">
                 EXPLORE • ANNUAL CAMPUS EVENT 2026
               </span>
             </div>
 
-            {/* Bold Display Headline: Event Lineup */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-display text-slate-950 tracking-tight leading-tight mb-4">
+            {/* Balanced Display Headline: Event Lineup */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-display text-slate-950 tracking-tight leading-tight mb-3">
               Event Lineup
             </h1>
 
-            {/* Authentic Human Description */}
-            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
+            {/* Authentic Description */}
+            <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed font-normal">
               Step into the arena of creativity, skill, and performance as the campus comes alive with unforgettable events across cultural, technical, and sports arenas.
             </p>
           </div>
 
           {/* ======================================================== */}
-          {/* THE 3-CARD COMPOSITION (Exact Card Design from reference) */}
+          {/* THE 3-CARD COMPOSITION (Proportional Laptop & Mobile Sizing) */}
           {/* ======================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch">
             {CATEGORY_CARDS.map((cat) => (
               <div
                 key={cat.id}
-                className="relative bg-white rounded-[24px] sm:rounded-[32px] p-4 sm:p-5 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/70 flex flex-col justify-between overflow-hidden group"
+                className="relative bg-white rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-white/70 flex flex-col justify-between overflow-hidden group"
               >
                 {/* Smooth Bottom Gradient matching reference */}
                 <div
-                  className={`absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[24px] sm:rounded-b-[32px]`}
+                  className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[24px] sm:rounded-b-[28px]`}
                 />
 
                 {/* Upper Visual Container with Rounded Colored Plate */}
-                <div className="relative w-full h-56 sm:h-72 flex items-center justify-center overflow-visible mb-4">
+                <div className="relative w-full h-44 sm:h-48 lg:h-52 flex items-center justify-center overflow-visible mb-3">
                   {/* Colored Backdrop Block (Peach / Cyan / Amber) - inset so character pops out */}
                   <div
-                    className={`absolute inset-x-4 top-3 bottom-4 rounded-3xl ${cat.plateColor} shadow-inner transition-transform duration-500 group-hover:scale-95`}
+                    className={`absolute inset-x-3 top-2 bottom-3 rounded-2xl ${cat.plateColor} shadow-inner transition-transform duration-500 group-hover:scale-95`}
                   />
 
                   {/* Character / Subject Illustration popping over the colored plate */}
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="relative z-10 max-h-56 sm:max-h-72 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-sm"
+                    className="relative z-10 max-h-44 sm:max-h-48 lg:max-h-52 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-xs"
                     loading="lazy"
                   />
                 </div>
@@ -243,26 +243,26 @@ export default function HomePage() {
                 {/* Card Content & Action Bar */}
                 <div className="relative z-10 text-center flex flex-col items-center">
                   {/* Bright Golden-Yellow Pill Badge */}
-                  <span className="bg-[#FFC700] text-slate-950 font-black text-xs px-4 py-1.5 rounded-full inline-block mb-2.5 shadow-xs uppercase tracking-wider">
+                  <span className="bg-[#FFC700] text-slate-950 font-black text-[11px] sm:text-xs px-3.5 py-1 rounded-full inline-block mb-2 shadow-2xs uppercase tracking-wider">
                     {cat.badgeText}
                   </span>
 
                   {/* Bold Display Card Title */}
-                  <h3 className="text-2xl sm:text-[26px] font-black font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-black font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
                     {cat.title}
                   </h3>
 
                   {/* Subtitle / Category info */}
-                  <p className="text-xs font-bold text-slate-600 mb-5 tracking-wide">
+                  <p className="text-xs font-bold text-slate-600 mb-4 tracking-wide">
                     {cat.categoryName}
                   </p>
 
                   {/* Bottom Action Bar: Black Pill + Black Circle Pin */}
-                  <div className="w-full flex items-center gap-3">
+                  <div className="w-full flex items-center gap-2.5">
                     <button
                       type="button"
                       onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
-                      className="flex-1 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-black text-white font-extrabold text-sm tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer text-center"
+                      className="flex-1 py-2.5 sm:py-3 px-4 rounded-full bg-slate-950 hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer text-center"
                     >
                       View Details
                     </button>
@@ -271,9 +271,9 @@ export default function HomePage() {
                       type="button"
                       onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
                       title={`Venue: ${cat.venue}`}
-                      className="w-12 h-12 rounded-full bg-slate-950 hover:bg-black text-white flex items-center justify-center shrink-0 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950 hover:bg-black text-white flex items-center justify-center shrink-0 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
                     >
-                      <MapPin className="w-5 h-5 text-white" />
+                      <MapPin className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
                     </button>
                   </div>
                 </div>
@@ -286,30 +286,30 @@ export default function HomePage() {
       {/* ======================================================== */}
       {/* 2. MAIN EVENTS DIRECTORY (SUB-EVENTS) */}
       {/* ======================================================== */}
-      <main id="events-directory" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
+      <main id="events-directory" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
         {/* Section Header matching main event section typography */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             {/* Super-Kicker */}
-            <div className="mb-3">
-              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.25em] uppercase text-slate-500 font-display break-words">
+            <div className="mb-2">
+              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase text-slate-500 font-display break-words">
                 ALL SUB-EVENTS • 2026 CAMPUS SCHEDULE
               </span>
             </div>
 
             {/* Display Headline */}
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-slate-950 tracking-tight leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-950 tracking-tight leading-tight mb-2">
               Live &amp; Upcoming Events
             </h2>
 
             {/* Description */}
-            <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl leading-relaxed font-normal">
               Browse individual schedules, competitions, and reserve your registration pass.
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start md:self-end">
-            <span className="px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-2xs text-xs sm:text-sm font-bold text-slate-700">
+            <span className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-2xs text-xs font-bold text-slate-700">
               Showing <strong className="text-slate-950">{filteredEvents.length}</strong> of{' '}
               <strong className="text-slate-950">{events.length}</strong> total events
             </span>
@@ -470,7 +470,7 @@ export default function HomePage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
             {filteredEvents.map((event) => (
               <EventCard key={event._id || event.id} event={event} />
             ))}

@@ -145,11 +145,11 @@ export default function EventDetailPage() {
         )}
 
         {/* ======================================================== */}
-        {/* MAIN EVENT SHOWCASE CARD (Matching HomePage rounded-[36px]) */}
+        {/* MAIN EVENT SHOWCASE CARD (Matching HomePage rounded-[28px]) */}
         {/* ======================================================== */}
-        <div className="bg-white rounded-[24px] sm:rounded-[36px] p-5 sm:p-10 shadow-xl border border-white/80 overflow-hidden mb-8">
+        <div className="bg-white rounded-[20px] sm:rounded-[28px] p-4 sm:p-8 shadow-md border border-white/80 overflow-hidden mb-6">
           {/* Hero Banner Container */}
-          <div className="relative aspect-[16/10] sm:aspect-[21/9] sm:h-96 min-h-[200px] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 mb-6 sm:mb-8 shadow-sm group">
+          <div className="relative aspect-[16/10] sm:aspect-[21/9] sm:h-64 lg:h-72 min-h-[180px] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 mb-5 sm:mb-6 shadow-sm group">
             <img
               src={event.imageUrl}
               alt={event.title}
@@ -195,16 +195,16 @@ export default function EventDetailPage() {
           </div>
 
           {/* Clean Modern Headline */}
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-950 tracking-normal leading-snug mb-8 font-sans">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-black font-display text-slate-950 tracking-tight leading-snug mb-6">
             {event.title}
           </h1>
 
           {/* ======================================================== */}
           {/* KEY INFO HIGHLIGHT CARDS (Schedule, Venue, Capacity) */}
           {/* ======================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-8">
             {/* 1. Schedule Card */}
-            <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
+            <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
               <div className="w-11 h-11 rounded-full bg-slate-950 text-white flex items-center justify-center shrink-0 shadow-sm">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
@@ -223,7 +223,7 @@ export default function EventDetailPage() {
             </div>
 
             {/* 2. Venue Card */}
-            <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
+            <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
               <div className="w-11 h-11 rounded-full bg-slate-950 text-white flex items-center justify-center shrink-0 shadow-sm">
                 <MapPin className="w-5 h-5 text-white" />
               </div>
@@ -241,7 +241,7 @@ export default function EventDetailPage() {
             </div>
 
             {/* 3. Capacity Card */}
-            <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
+            <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-100 flex items-start gap-3.5 shadow-2xs">
               <div className="w-11 h-11 rounded-full bg-slate-950 text-white flex items-center justify-center shrink-0 shadow-sm">
                 <Users className="w-5 h-5 text-white" />
               </div>
