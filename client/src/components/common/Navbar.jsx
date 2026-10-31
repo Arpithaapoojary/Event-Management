@@ -55,6 +55,18 @@ export default function Navbar() {
     return null;
   }
 
+  const scrollToEvents = () => {
+    setMobileMenuOpen(false);
+    if (location.pathname !== '/') {
+      window.location.href = '/#events-directory';
+      return;
+    }
+    const el = document.getElementById('events-directory');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const navigateToCategory = (arena) => {
     setMobileMenuOpen(false);
     // If not on homepage, navigate to homepage first with hash/state
@@ -84,12 +96,13 @@ export default function Navbar() {
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-          <Link
-            to="/"
-            className="px-3.5 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all"
+          <button
+            type="button"
+            onClick={scrollToEvents}
+            className="px-3.5 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all cursor-pointer"
           >
-            Explore Events
-          </Link>
+            All Events
+          </button>
           <button
             type="button"
             onClick={() => navigateToCategory('cultural')}
@@ -133,22 +146,24 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={scrollToEvents}
             className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all bg-slate-950 text-white hover:bg-black shadow-sm cursor-pointer active:scale-95"
           >
-            Book Passes
-          </Link>
+            Explore Events
+          </button>
         </div>
 
         {/* Mobile Hamburger Button */}
         <div className="flex items-center gap-2 md:hidden">
-          <Link
-            to="/"
-            className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-950 text-white hover:bg-black transition-all"
+          <button
+            type="button"
+            onClick={scrollToEvents}
+            className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-950 text-white hover:bg-black transition-all cursor-pointer"
           >
-            Explore
-          </Link>
+            Explore Events
+          </button>
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
@@ -177,20 +192,20 @@ export default function Navbar() {
             </div>
 
             <div className="space-y-1">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 text-slate-900 font-bold text-sm transition-colors"
+              <button
+                type="button"
+                onClick={scrollToEvents}
+                className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 text-slate-900 font-bold text-sm transition-colors text-left cursor-pointer"
                 role="menuitem"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
                     <Compass className="w-4 h-4" />
                   </div>
-                  <span>All Campus Events</span>
+                  <span>Explore Events</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
-              </Link>
+              </button>
 
               <button
                 type="button"
