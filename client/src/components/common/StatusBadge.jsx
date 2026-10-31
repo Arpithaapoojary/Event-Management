@@ -1,38 +1,32 @@
 import React from 'react';
-import { Clock, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
-export default function StatusBadge({ status, seatsLeft }) {
-  if (status === 'PAST') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-        <Clock className="w-3.5 h-3.5 text-slate-400" />
-        <span>Concluded</span>
-      </span>
-    );
-  }
+export default function StatusBadge({ status, seatsLeft, capacity, registeredCount }) {
+  let dotColor = 'bg-[#10B981]';
+  let label = 'Open';
 
-  if (status === 'FULL') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-        <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
-        <span>Sold Out</span>
-      </span>
-    );
-  }
+  const isPast = status === 'PAST';
+  const isFull = status === 'FULL' || (capacity && registeredCount !== undefined && registeredCount >= capacity);
+  const fillRate = capacity ? (registeredCount || 0) / capacity : 0;
+  const isFillingFast = (seatsLeft !== undefined && seatsLeft <= 10 && seatsLeft > 0) || fillRate >= 0.8;
 
-  if (seatsLeft !== undefined && seatsLeft <= 10 && seatsLeft > 0) {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-        <span>Only {seatsLeft} left</span>
-      </span>
-    );
+  if (isPast) {
+    dotColor = 'bg-[#9CA3AF]';
+    label = 'Concluded';
+  } else if (isFull) {
+    dotColor = 'bg-[#EF4444]';
+    label = 'Sold out';
+  } else if (isFillingFast) {
+    dotColor = 'bg-[#F59E0B]';
+    label = seatsLeft !== undefined && seatsLeft <= 10 ? `Only ${seatsLeft} left` : 'Filling fast';
+  } else {
+    dotColor = 'bg-[#10B981]';
+    label = seatsLeft !== undefined ? `${seatsLeft} open` : 'Open';
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-      <span>{seatsLeft !== undefined ? `${seatsLeft} seats open` : 'Open'}</span>
+    <span className="inline-flex items-center text-[12px] font-medium text-[#374151]">
+      <span className={`w-1.5 h-1.5 rounded-full ${dotColor} mr-2 shrink-0`} />
+      <span>{label}</span>
     </span>
   );
 }

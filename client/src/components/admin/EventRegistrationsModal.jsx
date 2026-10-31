@@ -3,14 +3,9 @@ import {
   X,
   Search,
   Users,
-  Mail,
-  Phone,
-  Calendar,
   Loader2,
   AlertCircle,
   Download,
-  ShieldCheck,
-  CheckCircle2,
 } from 'lucide-react';
 import api from '../../api/client';
 
@@ -81,65 +76,64 @@ export default function EventRegistrationsModal({ isOpen, event, onClose }) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-hero-fade-in overflow-y-auto font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto font-sans">
       <div
-        className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden my-8 animate-modal-in"
+        className="relative w-full max-w-3xl bg-white rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E5E7EB] overflow-hidden my-8"
         role="dialog"
         aria-modal="true"
       >
-        {/* Clean All-White Executive Header */}
-        <div className="relative px-6 sm:px-8 py-6 bg-white border-b border-slate-100">
+        {/* Header */}
+        <div className="relative px-6 py-5 bg-white border-b border-[#E5E7EB]">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            className="absolute top-5 right-5 p-1.5 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors cursor-pointer"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 stroke-[1.5]" />
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mb-2">
-            <Users className="w-3.5 h-3.5 text-blue-600" />
-            <span>Verified Attendee Roster</span>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#F3F4F6] text-[#374151] text-[12px] font-medium mb-1.5">
+            <span>Attendee Roster</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 line-clamp-1 pr-8">
+          <h3 className="text-[20px] font-semibold text-[#111827] tracking-[-0.01em] line-clamp-1 pr-8">
             {event.title}
           </h3>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 mt-1.5">
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-[#6B7280] mt-1">
             <span>{event.venue}</span>
-            <span>•</span>
-            <span className="font-semibold text-slate-900">
-              {registrations.length} of {event.capacity} seats filled ({capacityPercent}%)
+            <span>·</span>
+            <span className="tabular-nums font-medium text-[#111827]">
+              {registrations.length} / {event.capacity} seats filled ({capacityPercent}%)
             </span>
           </div>
         </div>
 
         {/* Toolbar & Search */}
-        <div className="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="px-6 py-3 border-b border-[#E5E7EB] bg-[#FAFAFA] flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative w-full sm:w-80">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <Search className="w-4 h-4" />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9CA3AF]">
+              <Search className="w-4 h-4 stroke-[1.5]" />
             </div>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by student name, email, or phone..."
-              className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-hidden focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10 transition font-medium"
+              placeholder="Search by student name, email, phone..."
+              className="w-full h-9 pl-9 pr-3 text-[13px] rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <span className="text-sm text-slate-600 font-medium">
-              Showing <strong className="text-slate-900 font-bold">{filteredRegistrations.length}</strong> attendees
+            <span className="text-[12px] text-[#6B7280] tabular-nums">
+              Showing <strong className="font-medium text-[#111827]">{filteredRegistrations.length}</strong> attendees
             </span>
 
             {registrations.length > 0 && (
               <button
                 type="button"
                 onClick={exportToCSV}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs hover:shadow-xs transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1.5 h-9 px-3 rounded-[8px] bg-white hover:bg-[#F9FAFB] active:bg-[#F3F4F6] border border-[#E5E7EB] text-[13px] font-medium text-[#111827] transition-colors cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5 text-slate-600" />
+                <Download className="w-4 h-4 stroke-[1.5] text-[#6B7280]" />
                 <span>Export CSV</span>
               </button>
             )}
@@ -147,74 +141,68 @@ export default function EventRegistrationsModal({ isOpen, event, onClose }) {
         </div>
 
         {/* Attendee Table */}
-        <div className="p-4 sm:p-6 max-h-[55vh] overflow-y-auto">
+        <div className="p-6 max-h-[55vh] overflow-y-auto">
           {loading ? (
-            <div className="py-14 flex flex-col items-center justify-center text-slate-400">
-              <Loader2 className="w-7 h-7 animate-spin text-slate-900 mb-2" />
-              <span className="text-sm font-medium">Loading attendee roster...</span>
+            <div className="py-16 flex flex-col items-center justify-center text-[#6B7280]">
+              <Loader2 className="w-6 h-6 stroke-[1.5] animate-spin text-[#0F172A] mb-2" />
+              <span className="text-[13px] font-medium">Loading attendee roster...</span>
             </div>
           ) : error ? (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+            <div className="p-3.5 rounded-[8px] bg-rose-50 border border-rose-200 text-rose-700 text-[13px] font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 stroke-[1.5]" />
               <span>{error}</span>
             </div>
           ) : filteredRegistrations.length === 0 ? (
-            <div className="py-14 text-center text-slate-400">
-              <Users className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-              <p className="text-base font-bold text-slate-700">No Registrations Found</p>
-              <p className="text-sm text-slate-500 mt-1">
+            <div className="py-16 text-center text-[#6B7280]">
+              <Users className="w-8 h-8 stroke-[1.5] mx-auto text-[#9CA3AF] mb-2" />
+              <p className="text-[14px] font-medium text-[#111827]">No Registrations Found</p>
+              <p className="text-[13px] text-[#6B7280] mt-1">
                 {searchTerm
                   ? 'No attendees matched your search criteria.'
                   : 'No student registrations recorded for this event yet.'}
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
-              <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 text-xs uppercase tracking-wider">
-                    <th className="py-3 px-4">#</th>
-                    <th className="py-3 px-4">Student Attendee</th>
-                    <th className="py-3 px-4">Email Address</th>
-                    <th className="py-3 px-4">Mobile Number</th>
-                    <th className="py-3 px-4">Ticket ID</th>
-                    <th className="py-3 px-4">Registered At</th>
+            <div className="overflow-x-auto rounded-[8px] border border-[#E5E7EB]">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-[#FAFAFA] border-b border-[#E5E7EB]">
+                  <tr>
+                    <th className="py-2.5 px-3 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">#</th>
+                    <th className="py-2.5 px-4 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">Student Attendee</th>
+                    <th className="py-2.5 px-4 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">Email</th>
+                    <th className="py-2.5 px-4 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">Phone</th>
+                    <th className="py-2.5 px-4 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">Ticket ID</th>
+                    <th className="py-2.5 px-4 text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280]">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#E5E7EB]">
                   {filteredRegistrations.map((reg, index) => {
                     const regDate = new Date(reg.createdAt).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
                     });
 
                     return (
-                      <tr key={reg._id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3.5 px-4 font-mono text-slate-400 text-xs">{index + 1}</td>
-                        <td className="py-3.5 px-4 font-bold text-slate-900">
+                      <tr key={reg._id} className="h-12 hover:bg-[#F9FAFB] transition-colors text-[13px]">
+                        <td className="py-2.5 px-3 font-mono text-[#9CA3AF] text-[12px] tabular-nums">
+                          {index + 1}
+                        </td>
+                        <td className="py-2.5 px-4 font-medium text-[#111827]">
                           {reg.fullName}
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600">
-                          <span className="flex items-center gap-1.5">
-                            <Mail className="w-4 h-4 text-slate-400 shrink-0" />
-                            <span>{reg.email}</span>
-                          </span>
+                        <td className="py-2.5 px-4 text-[#374151]">
+                          {reg.email}
                         </td>
-                        <td className="py-3.5 px-4 text-slate-800 font-semibold whitespace-nowrap">
-                          <span className="flex items-center gap-1.5">
-                            <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                            <span>+91 {reg.contactNumber}</span>
-                          </span>
+                        <td className="py-2.5 px-4 text-[#374151] whitespace-nowrap tabular-nums">
+                          +91 {reg.contactNumber}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-xs text-slate-700">
-                          <span className="px-2.5 py-1 bg-slate-100 border border-slate-200/80 rounded-md font-semibold">
+                        <td className="py-2.5 px-4 font-mono text-[12px] text-[#374151]">
+                          <span className="px-1.5 py-0.5 rounded-[4px] bg-[#F3F4F6] border border-[#E5E7EB] tabular-nums">
                             #REG-{reg._id ? reg._id.slice(-6).toUpperCase() : 'PASS'}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-500 text-xs whitespace-nowrap">
+                        <td className="py-2.5 px-4 text-[#6B7280] text-[12px] whitespace-nowrap tabular-nums">
                           {regDate}
                         </td>
                       </tr>
@@ -227,17 +215,16 @@ export default function EventRegistrationsModal({ isOpen, event, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-8 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Official Campus Event Attendee Record</span>
+        <div className="px-6 py-3.5 bg-[#FAFAFA] border-t border-[#E5E7EB] flex items-center justify-between">
+          <div className="text-[12px] text-[#6B7280]">
+            Confirmed student attendance records
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-sm transition shadow-sm cursor-pointer"
+            className="h-9 px-4 rounded-[8px] bg-[#0F172A] hover:bg-[#1E293B] text-white font-medium text-[13px] transition-colors cursor-pointer"
           >
-            Close Roster
+            Close
           </button>
         </div>
       </div>

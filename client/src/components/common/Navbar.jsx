@@ -12,6 +12,11 @@ export default function Navbar() {
     setHasAdminToken(Boolean(localStorage.getItem('admin_token')));
   }, [location]);
 
+  // The enterprise admin console renders its own top bar
+  if (location.pathname === '/admin') {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#EDF5FB]/90 border-b border-sky-200/60 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

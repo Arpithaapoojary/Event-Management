@@ -1,8 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Lock, Sparkles } from 'lucide-react';
 
 export default function Footer() {
+  const location = useLocation();
+  if (location.pathname === '/admin') return null;
+
   return (
     <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">

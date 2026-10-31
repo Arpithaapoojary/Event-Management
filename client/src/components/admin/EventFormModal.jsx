@@ -258,101 +258,95 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-hero-fade-in overflow-y-auto font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto font-sans">
       <div
-        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden my-8 animate-modal-in"
+        className="relative w-full max-w-2xl bg-white rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E5E7EB] overflow-hidden my-8"
         role="dialog"
         aria-modal="true"
       >
-        {/* Clean All-White Executive Header */}
-        <div className="relative px-6 sm:px-8 py-6 bg-white border-b border-slate-100">
+        {/* Enterprise Header */}
+        <div className="relative px-6 py-5 bg-white border-b border-[#E5E7EB]">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            className="absolute top-5 right-5 p-1.5 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors cursor-pointer"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 stroke-[1.5]" />
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>{isEditing ? 'Update Event Listing' : 'Campus Event Publishing'}</span>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#F3F4F6] text-[#374151] text-[12px] font-medium mb-1.5">
+            <span>{isEditing ? 'Update Event' : 'Create Event'}</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 pr-8">
+          <h3 className="text-[20px] font-semibold text-[#111827] tracking-[-0.01em]">
             {isEditing ? 'Edit Event Details' : 'Create Campus Event'}
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-[13px] text-[#6B7280] mt-0.5">
             {isEditing
               ? `Modifying listings for "${event.title}"`
-              : 'Add an authorized event to the live student catalog'}
+              : 'Add an authorized event to the campus schedule and catalog'}
           </p>
         </div>
 
         {/* Modal Form Body */}
-        <form onSubmit={handleSubmit} noValidate className="p-6 sm:p-8 space-y-5 max-h-[78vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4 max-h-[78vh] overflow-y-auto">
           {serverError && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold flex items-start gap-2.5 animate-shake">
-              <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+            <div className="p-3 rounded-[8px] bg-rose-50 border border-rose-200 text-rose-700 text-[13px] font-medium flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 stroke-[1.5]" />
               <span>{serverError}</span>
             </div>
           )}
 
           {/* Event Title */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            <label className="block text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280] mb-1.5">
               Event Title <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <FileText className="w-4 h-4" />
-              </div>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="e.g. Annual AI & Tech Summit 2026"
-                className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border bg-white focus:outline-hidden transition-all font-medium ${
+                placeholder="e.g. Annual AI & Tech Summit"
+                className={`w-full h-9 px-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors font-normal text-[#111827] placeholder:text-[#9CA3AF] ${
                   errors.title
-                    ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-4 focus:ring-rose-100'
-                    : 'border-slate-300 focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10'
+                    ? 'border-rose-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500'
+                    : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
                 }`}
               />
             </div>
-            {errors.title && <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.title}</p>}
+            {errors.title && <p className="text-[12px] text-rose-600 mt-1">{errors.title}</p>}
           </div>
 
-          {/* Section / Category Selector (Cultural, Technical, Sports) - No Emojis */}
+          {/* Category Selector (Cultural, Technical, Sports) - Pure neutral text-only buttons */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-              Arena Category <span className="text-rose-500">*</span>
+            <label className="block text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280] mb-1.5">
+              Category <span className="text-rose-500">*</span>
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
               {[
-                { id: 'Cultural', label: 'Cultural', Icon: Palette, iconColor: 'text-amber-600', desc: 'Arts, Dance, Music' },
-                { id: 'Technical', label: 'Technical', Icon: Cpu, iconColor: 'text-blue-600', desc: 'Coding, Hackathons, AI' },
-                { id: 'Sports', label: 'Sports', Icon: Trophy, iconColor: 'text-emerald-600', desc: 'Athletics, Tournaments' },
+                { id: 'Cultural', label: 'Cultural', desc: 'Arts, Music, Drama' },
+                { id: 'Technical', label: 'Technical', desc: 'Coding, Hackathons, AI' },
+                { id: 'Sports', label: 'Sports', desc: 'Athletics, Tournaments' },
               ].map((cat) => {
-                const IconComponent = cat.Icon;
                 const isSelected = formData.category === cat.id;
                 return (
                   <button
                     type="button"
                     key={cat.id}
                     onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
-                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    className={`p-3 rounded-[8px] border text-left transition-colors cursor-pointer ${
                       isSelected
-                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm ring-1 ring-slate-900'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                        ? 'border-[#0F172A] bg-[#0F172A] text-white shadow-sm'
+                        : 'border-[#E5E7EB] bg-white hover:bg-[#F9FAFB] text-[#111827]'
                     }`}
                   >
-                    <div className="flex items-center gap-2 font-bold text-sm">
-                      <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : cat.iconColor}`} />
+                    <div className="font-medium text-[13px]">
                       <span>{cat.label}</span>
                     </div>
                     <span
-                      className={`text-xs block mt-1 font-medium line-clamp-1 ${
-                        isSelected ? 'text-slate-300' : 'text-slate-500'
+                      className={`text-[11px] block mt-0.5 line-clamp-1 ${
+                        isSelected ? 'text-slate-300' : 'text-[#6B7280]'
                       }`}
                     >
                       {cat.desc}
@@ -601,48 +595,48 @@ export default function EventFormModal({ isOpen, event, onClose, onSaved }) {
 
           {/* Event Description */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            <label className="block text-[11px] font-medium uppercase tracking-[0.04em] text-[#6B7280] mb-1.5">
               Event Description <span className="text-rose-500">*</span>
             </label>
             <textarea
               name="description"
-              rows={4}
+              rows={3}
               value={formData.description}
               onChange={handleChange}
-              placeholder="Provide a comprehensive event overview, highlights, agenda, and guidelines for students..."
-              className={`w-full p-4 text-sm rounded-xl border bg-white focus:outline-hidden transition-all leading-relaxed font-medium ${
+              placeholder="Provide a comprehensive event overview, highlights, and guidelines for students..."
+              className={`w-full p-3 text-[13px] rounded-[8px] border bg-white focus:outline-none transition-colors leading-relaxed font-normal text-[#111827] placeholder:text-[#9CA3AF] ${
                 errors.description
-                  ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-4 focus:ring-rose-100'
-                  : 'border-slate-300 focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10'
+                  ? 'border-rose-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500'
+                  : 'border-[#E5E7EB] focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]'
               }`}
             />
             {errors.description && (
-              <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.description}</p>
+              <p className="text-[12px] text-rose-600 mt-1">{errors.description}</p>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+          <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-[#E5E7EB]">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all disabled:opacity-50 cursor-pointer"
+              className="h-9 px-4 rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] hover:bg-[#F9FAFB] active:bg-[#F3F4F6] font-medium text-[13px] transition-colors disabled:opacity-50 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-sm transition-all shadow-sm hover:shadow active:scale-95 disabled:opacity-70 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-[8px] bg-[#0F172A] hover:bg-[#1E293B] active:bg-[#0F172A] text-white font-medium text-[13px] transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Saving Event...</span>
+                  <Loader2 className="w-4 h-4 stroke-[1.5] animate-spin" />
+                  <span>Saving...</span>
                 </>
               ) : (
-                <span>{isEditing ? 'Save Changes' : 'Publish Campus Event'}</span>
+                <span>{isEditing ? 'Save Changes' : 'Create Event'}</span>
               )}
             </button>
           </div>

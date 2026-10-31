@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, X, Loader2, ShieldCheck, Calendar, MapPin, Users } from 'lucide-react';
+import { X, Loader2, Calendar, MapPin, Users, ShieldAlert } from 'lucide-react';
 
 export default function DeleteConfirmModal({
   isOpen,
@@ -11,71 +11,62 @@ export default function DeleteConfirmModal({
   if (!isOpen || !event) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-hero-fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs font-sans">
       <div
-        className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden transform animate-modal-in transition-all"
+        className="relative w-full max-w-md bg-white rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E5E7EB] overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        {/* Clean All-White Header */}
-        <div className="relative px-6 sm:px-8 py-6 bg-white border-b border-slate-100">
+        {/* Header */}
+        <div className="relative px-6 py-5 bg-white border-b border-[#E5E7EB]">
           <button
             onClick={onClose}
             disabled={isDeleting}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            className="absolute top-5 right-5 p-1.5 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors cursor-pointer"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 stroke-[1.5]" />
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold mb-2">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Event Deactivation</span>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-rose-50 text-rose-700 text-[12px] font-medium mb-1.5">
+            <span>Deactivate Event</span>
           </div>
-          <h3 className="text-xl font-bold text-slate-900 pr-8">
-            Deactivate Event Listing
+          <h3 className="text-[18px] font-semibold text-[#111827] tracking-[-0.01em]">
+            Confirm Deactivation
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Remove this event from the live campus catalog
+          <p className="text-[13px] text-[#6B7280] mt-0.5">
+            This event will be unpublished from the campus catalog.
           </p>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 sm:p-8">
-          <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-            Are you sure you want to deactivate <strong className="text-slate-900 font-bold">"{event.title}"</strong>? New student registrations will be disabled immediately.
+        <div className="p-6">
+          <p className="text-[13px] text-[#374151] mb-4 leading-relaxed">
+            Are you sure you want to deactivate <strong className="font-semibold text-[#111827]">"{event.title}"</strong>? New registrations will be disabled immediately.
           </p>
 
           {/* Event Summary Card */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-2 mb-4">
-            <div className="font-bold text-slate-900 line-clamp-1">{event.title}</div>
-            <div className="flex items-center justify-between text-slate-500 pt-2 border-t border-slate-200">
-              <span className="flex items-center gap-1.5 text-xs font-medium">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                <span className="truncate max-w-[150px]">{event.venue}</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900">
-                <Users className="w-4 h-4 text-slate-500" />
-                <span>{event.registeredCount || 0} Registered</span>
+          <div className="p-3.5 rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB] text-[13px] space-y-2 mb-4">
+            <div className="font-medium text-[#111827] truncate">{event.title}</div>
+            <div className="flex items-center justify-between text-[#6B7280] text-[12px] pt-2 border-t border-[#E5E7EB]">
+              <span className="truncate max-w-[160px]">{event.venue}</span>
+              <span className="tabular-nums font-medium text-[#111827]">
+                {event.registeredCount || 0} registered
               </span>
             </div>
           </div>
 
-          {/* Data integrity security guarantee */}
-          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 leading-normal mb-6">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              <strong>Data Protection Guarantee:</strong> Soft-deletion protects student records. All registered attendee history and ticket passes remain safely archived for audit reports.
-            </span>
+          <div className="p-3 rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB] text-[12px] text-[#6B7280] leading-normal mb-6">
+            Registered student records and ticket IDs remain safely archived for audit reporting.
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
               disabled={isDeleting}
-              className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-all cursor-pointer"
+              className="h-9 px-4 rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] hover:bg-[#F9FAFB] active:bg-[#F3F4F6] font-medium text-[13px] transition-colors disabled:opacity-50 cursor-pointer"
             >
               Cancel
             </button>
@@ -83,11 +74,11 @@ export default function DeleteConfirmModal({
               type="button"
               onClick={onConfirm}
               disabled={isDeleting}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-semibold text-sm transition-all shadow-sm hover:shadow-md disabled:opacity-60 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-[8px] bg-[#DC2626] hover:bg-[#B91C1C] text-white font-medium text-[13px] transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
             >
               {isDeleting ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-4 h-4 stroke-[1.5] animate-spin" />
                   <span>Deactivating...</span>
                 </>
               ) : (

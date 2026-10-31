@@ -1,33 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Calendar,
-  Users,
-  Sparkles,
   Plus,
   Search,
+  RefreshCw,
   Edit2,
   Trash2,
-  UserCheck,
-  RefreshCw,
-  LogOut,
-  Clock,
-  MapPin,
-  CheckCircle,
-  AlertCircle,
-  Filter,
   Eye,
   Download,
+  Calendar,
+  Users,
+  CheckCircle2,
+  X,
   ExternalLink,
-  ShieldCheck,
-  ArrowLeft,
-  Layers,
-  Cpu,
-  Trophy,
-  Palette,
 } from 'lucide-react';
 import api from '../../api/client';
-import StatusBadge from '../../components/common/StatusBadge';
+import {
+  AdminHeader,
+  StatCard,
+  StatusBadge,
+  CategoryBadge,
+  Tabs,
+  Button,
+  Table,
+  TableHeader,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Pagination,
+  TableEmptyState,
+  TableLoadingState,
+} from '../../components/admin/enterprise';
 import EventFormModal from '../../components/admin/EventFormModal';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 import EventRegistrationsModal from '../../components/admin/EventRegistrationsModal';
@@ -58,12 +62,16 @@ export default function AdminDashboardPage() {
   const [eventSearch, setEventSearch] = useState('');
   const [eventStatusFilter, setEventStatusFilter] = useState('all');
   const [eventCategoryFilter, setEventCategoryFilter] = useState('all');
+  const [eventPage, setEventPage] = useState(1);
+  const [eventPageSize, setEventPageSize] = useState(10);
 
-  // All Registrations list & filters
+  // Registrations list & filters
   const [registrations, setRegistrations] = useState([]);
   const [regLoading, setRegLoading] = useState(false);
   const [regSearch, setRegSearch] = useState('');
   const [selectedEventId, setSelectedEventId] = useState('');
+  const [regPage, setRegPage] = useState(1);
+  const [regPageSize, setRegPageSize] = useState(10);
 
   // Modals state
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -76,7 +84,7 @@ export default function AdminDashboardPage() {
   const [rosterModalOpen, setRosterModalOpen] = useState(false);
   const [rosterEvent, setRosterEvent] = useState(null);
 
-  // Success Notification banner
+  // Notice alert banner
   const [bannerNotice, setBannerNotice] = useState(null);
 
   // Authentication check
@@ -205,39 +213,71 @@ export default function AdminDashboardPage() {
   };
 
   // Category counts
-  const culturalCount = events.filter((e) => (e.category || '').toLowerCase() === 'cultural').length;
-  const technicalCount = events.filter((e) => (e.category || '').toLowerCase() === 'technical').length;
-  const sportsCount = events.filter((e) => (e.category || '').toLowerCase() === 'sports').length;
+  const culturalCount = useMemo(
+    () => events.filter((e) => (e.category || '').toLowerCase() === 'cultural').length,
+    [events]
+  );
+  const technicalCount = useMemo(
+    () => events.filter((e) => (e.category || '').toLowerCase() === 'technical').length,
+    [events]
+  );
+  const sportsCount = useMemo(
+    () => events.filter((e) => (e.category || '').toLowerCase() === 'sports').length,
+    [events]
+  );
 
   // Filtered Events with Category & Status filters
-  const filteredEvents = events.filter((ev) => {
-    // Category filter
-    if (eventCategoryFilter !== 'all') {
-      const cat = (ev.category || 'Cultural').toLowerCase();
-      if (cat !== eventCategoryFilter.toLowerCase()) return false;
-    }
+  const filteredEvents = useMemo(() => {
+    return events.filter((ev) => {
+      // Category filter
+      if (eventCategoryFilter !== 'all') {
+        const cat = (ev.category || 'Cultural').toLowerCase();
+        if (cat !== eventCategoryFilter.toLowerCase()) return false;
+      }
 
-    // Status filter
-    if (eventStatusFilter === 'upcoming' && ev.status === 'PAST') return false;
-    if (eventStatusFilter === 'open' && ev.status !== 'UPCOMING') return false;
-    if (eventStatusFilter === 'full' && ev.status !== 'FULL') return false;
-    if (eventStatusFilter === 'past' && ev.status !== 'PAST') return false;
+      // Status filter
+      if (eventStatusFilter === 'upcoming' && ev.status === 'PAST') return false;
+      if (eventStatusFilter === 'open' && ev.status !== 'UPCOMING') return false;
+      if (eventStatusFilter === 'full' && ev.status !== 'FULL') return false;
+      if (eventStatusFilter === 'past' && ev.status !== 'PAST') return false;
+      if (eventStatusFilter === 'filling' && !(ev.registeredCount && ev.capacity && (ev.registeredCount / ev.capacity >= 0.8))) {
+        return false;
+      }
 
-    // Search query
-    if (eventSearch.trim() !== '') {
-      const q = eventSearch.toLowerCase();
-      const matchTitle = ev.title?.toLowerCase().includes(q);
-      const matchVenue = ev.venue?.toLowerCase().includes(q);
-      const matchCat = ev.category?.toLowerCase().includes(q);
-      return matchTitle || matchVenue || matchCat;
-    }
-    return true;
-  });
+      // Search query
+      if (eventSearch.trim() !== '') {
+        const q = eventSearch.toLowerCase();
+        const matchTitle = ev.title?.toLowerCase().includes(q);
+        const matchVenue = ev.venue?.toLowerCase().includes(q);
+        const matchCat = ev.category?.toLowerCase().includes(q);
+        return matchTitle || matchVenue || matchCat;
+      }
+      return true;
+    });
+  }, [events, eventCategoryFilter, eventStatusFilter, eventSearch]);
 
-  // Export Master Roster to CSV with Category Column
+  // Paginated Events
+  const totalEventPages = Math.max(1, Math.ceil(filteredEvents.length / eventPageSize));
+  const paginatedEvents = useMemo(() => {
+    const start = (eventPage - 1) * eventPageSize;
+    return filteredEvents.slice(start, start + eventPageSize);
+  }, [filteredEvents, eventPage, eventPageSize]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setEventPage(1);
+  }, [eventCategoryFilter, eventStatusFilter, eventSearch]);
+
+  // Paginated Registrations
+  const totalRegPages = Math.max(1, Math.ceil(registrations.length / regPageSize));
+  const paginatedRegistrations = useMemo(() => {
+    const start = (regPage - 1) * regPageSize;
+    return registrations.slice(start, start + regPageSize);
+  }, [registrations, regPage, regPageSize]);
+
+  // Export Master Roster to CSV
   const exportMasterCSV = () => {
-    const listToExport = registrations.length > 0 ? registrations : [];
-    if (!listToExport.length) {
+    if (!registrations.length) {
       alert('No registration records available to export.');
       return;
     }
@@ -248,13 +288,13 @@ export default function AdminDashboardPage() {
       'Email Address',
       'Mobile Number (India)',
       'Event Name',
-      'Arena Section / Category',
+      'Category',
       'Campus Venue',
       'Registration Date',
       'Ticket Code',
     ];
 
-    const rows = listToExport.map((r, i) => [
+    const rows = registrations.map((r, i) => [
       i + 1,
       `"${r.fullName || ''}"`,
       `"${r.email || ''}"`,
@@ -271,218 +311,119 @@ export default function AdminDashboardPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `Master_Campus_Event_Roster_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `EventFlow_Attendees_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // Helper for Category badge rendering (No emojis, clean SVG icons)
-  const renderCategoryBadge = (category) => {
-    const cat = category || 'Cultural';
-    if (cat === 'Technical') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
-          <Cpu className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-          <span>Technical</span>
-        </span>
-      );
-    }
-    if (cat === 'Sports') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-          <Trophy className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-          <span>Sports</span>
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/80">
-        <Palette className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-        <span>Cultural</span>
-      </span>
-    );
-  };
+  const tabsConfig = [
+    { id: 'events', label: 'Event Management', count: events.length },
+    { id: 'registrations', label: 'Student Attendee Rosters', count: stats.totalRegistrations },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-28 font-sans selection:bg-slate-200">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* Banner Notice Alert */}
+    <div className="min-h-screen bg-[#FAFAFA] text-[#111827] font-sans pb-16 selection:bg-slate-200">
+      {/* 1. TOP BAR HEADER: Simple top bar, logo left, subtle user menu right */}
+      <AdminHeader onLogout={handleLogout} />
+
+      {/* Main Content Workspace */}
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {/* Banner Alert for Actions */}
         {bannerNotice && (
-          <div className="mb-6 p-4 rounded-2xl bg-white border border-emerald-200 shadow-sm text-slate-900 text-sm font-medium flex items-center justify-between animate-hero-fade-in">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                <CheckCircle className="w-4 h-4" />
-              </div>
-              <span className="font-semibold">{bannerNotice}</span>
+          <div
+            role="status"
+            className="mb-6 p-3.5 rounded-[8px] bg-white border border-[#E5E7EB] text-[#111827] text-[13px] flex items-center justify-between shadow-[0_1px_3px_rgba(0,0,0,0.03)]"
+          >
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 stroke-[1.5] text-[#10B981] shrink-0" />
+              <span className="font-medium">{bannerNotice}</span>
             </div>
             <button
               onClick={() => setBannerNotice(null)}
-              className="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1 cursor-pointer"
+              className="text-[#6B7280] hover:text-[#111827] text-[12px] font-medium p-1 cursor-pointer"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        {/* 1. UNCONGESTED OPEN PAGE HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 animate-hero-fade-up">
+        {/* 2. PAGE HEADER: Title and subtitle on left, primary button "Create Event" on right */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
-              <Link
-                to="/"
-                className="hover:text-slate-900 transition flex items-center gap-1.5 group"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-                <span>Events Catalog</span>
-              </Link>
-              <span>/</span>
-              <span className="text-slate-800 font-bold">Admin Console</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Campus Operations Console
+            <h1 className="text-[24px] font-semibold text-[#111827] tracking-[-0.01em] leading-tight">
+              Event Management
             </h1>
-            <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-              Oversee campus event schedules, seating capacity, and student registrations.
+            <p className="text-[14px] text-[#6B7280] font-normal mt-1">
+              Manage campus event schedules, venue capacity, and student registrations.
             </p>
           </div>
 
-          {/* Top Actions */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-glow" />
-              <span>Coordinator Session Active</span>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-700 text-xs font-semibold transition active:scale-95 cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
-            </button>
-            <button
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="primary"
+              size="md"
+              icon={Plus}
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-sm font-semibold transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Create Campus Event</span>
-            </button>
+              Create Event
+            </Button>
           </div>
         </div>
 
-        {/* 2. STANDALONE SPACIOUS KPI METRIC CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Card 1: Total Published Events */}
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Published Events
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                <Calendar className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {stats.totalEvents}
-            </div>
-            <span className="text-xs text-slate-500 font-medium mt-1.5 block">
-              {stats.upcomingEvents} Upcoming • {stats.pastEvents} Concluded
-            </span>
-          </div>
-
-          {/* Card 2: Student Passes */}
-          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs card-hover-lift">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Student Passes Issued
-              </span>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {stats.totalRegistrations}
-            </div>
-            <span className="text-xs text-emerald-700 font-semibold mt-1.5 block">
-              Active Verified Attendee Records
-            </span>
-          </div>
+        {/* 3. STAT CARDS: 2 cards, 12px radius max, 1px border, no icons in colored boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <StatCard
+            label="Total Events"
+            value={stats.totalEvents}
+            helperText={`${stats.upcomingEvents} upcoming · ${stats.pastEvents} concluded`}
+          />
+          <StatCard
+            label="Student Registrations"
+            value={stats.totalRegistrations}
+            helperText="Active confirmed student attendee records"
+          />
         </div>
 
-        {/* 3. CLEAN SEGMENTED NAVIGATION TABS */}
-        <div className="border-b border-slate-200 mb-6">
-          <div className="flex items-center gap-8">
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`pb-3.5 text-sm font-bold border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'events'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Event Management</span>
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                  activeTab === 'events' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {events.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('registrations')}
-              className={`pb-3.5 text-sm font-bold border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'registrations'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              <span>Student Attendee Rosters</span>
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                  activeTab === 'registrations' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {stats.totalRegistrations}
-              </span>
-            </button>
-          </div>
-        </div>
+        {/* 4. UNDERLINE-STYLE TABS: No icons, small neutral count */}
+        <Tabs
+          tabs={tabsConfig}
+          activeTab={activeTab}
+          onChange={(tabId) => setActiveTab(tabId)}
+          className="mb-6"
+        />
 
         {/* ======================================================== */}
-        {/* TAB 1: EVENT MANAGEMENT (CRUD) */}
+        {/* TAB 1: EVENT MANAGEMENT */}
         {/* ======================================================== */}
         {activeTab === 'events' && (
           <div className="space-y-4">
-            {/* Streamlined Filter & Search Toolbar */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
-              {/* Category Arena Tabs */}
-              <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Filter & Search Toolbar */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              {/* Segmented control for categories */}
+              <div className="bg-[#F3F4F6] p-1 rounded-[8px] inline-flex items-center gap-1 self-start">
                 {[
-                  { key: 'all', label: 'All Arenas', Icon: Layers, count: events.length },
-                  { key: 'Cultural', label: 'Cultural', Icon: Palette, iconColor: 'text-amber-600', count: culturalCount },
-                  { key: 'Technical', label: 'Technical', Icon: Cpu, iconColor: 'text-blue-600', count: technicalCount },
-                  { key: 'Sports', label: 'Sports', Icon: Trophy, iconColor: 'text-emerald-600', count: sportsCount },
-                ].map(({ key, label, Icon, iconColor, count }) => {
-                  const isSelected = eventCategoryFilter === key;
+                  { key: 'all', label: 'All', count: events.length },
+                  { key: 'Cultural', label: 'Cultural', count: culturalCount },
+                  { key: 'Technical', label: 'Technical', count: technicalCount },
+                  { key: 'Sports', label: 'Sports', count: sportsCount },
+                ].map(({ key, label, count }) => {
+                  const isActive = eventCategoryFilter === key;
                   return (
                     <button
                       key={key}
+                      type="button"
                       onClick={() => setEventCategoryFilter(key)}
-                      className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+                      className={`px-3 py-1.5 text-[13px] rounded-[6px] transition-all cursor-pointer font-medium select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F172A] ${
+                        isActive
+                          ? 'bg-white text-[#111827] shadow-[0_1px_2px_rgba(0,0,0,0.06)] border border-[#E5E7EB]'
+                          : 'text-[#6B7280] hover:text-[#111827] border border-transparent'
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : iconColor || 'text-slate-500'}`} />
                       <span>{label}</span>
                       <span
-                        className={`px-1.5 py-0.2 rounded-md text-[11px] font-bold ${
-                          isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                        className={`ml-1.5 text-[11px] tabular-nums ${
+                          isActive ? 'text-[#111827] font-semibold' : 'text-[#6B7280]'
                         }`}
                       >
                         {count}
@@ -492,77 +433,102 @@ export default function AdminDashboardPage() {
                 })}
               </div>
 
-              {/* Search & Status row */}
-              <div className="flex items-center gap-3 w-full lg:w-auto">
+              {/* Right side: Search, Status select, Refresh button (all 36px) */}
+              <div className="flex items-center gap-2.5 w-full lg:w-auto">
+                {/* Search Input */}
                 <div className="relative flex-1 lg:w-64">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Search className="w-4 h-4" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9CA3AF]">
+                    <Search className="w-4 h-4 stroke-[1.5]" />
                   </div>
                   <input
                     type="text"
                     value={eventSearch}
                     onChange={(e) => setEventSearch(e.target.value)}
                     placeholder="Search events..."
-                    className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 transition font-medium"
+                    className="w-full h-9 pl-9 pr-8 text-[13px] rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
                   />
+                  {eventSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setEventSearch('')}
+                      className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#9CA3AF] hover:text-[#111827]"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5 stroke-[1.5]" />
+                    </button>
+                  )}
                 </div>
 
+                {/* Status Select */}
                 <select
                   value={eventStatusFilter}
                   onChange={(e) => setEventStatusFilter(e.target.value)}
-                  className="px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-slate-900 text-slate-700 font-semibold cursor-pointer"
+                  className="h-9 px-3 text-[13px] font-medium text-[#111827] bg-white border border-[#E5E7EB] rounded-[8px] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] cursor-pointer"
                 >
-                  <option value="all">All Status</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="open">Registration Open</option>
+                  <option value="all">All Statuses</option>
+                  <option value="open">Open</option>
+                  <option value="filling">Filling Fast</option>
                   <option value="full">Sold Out</option>
                   <option value="past">Concluded</option>
                 </select>
 
+                {/* Refresh Button */}
                 <button
+                  type="button"
                   onClick={() => {
                     fetchStats();
                     fetchEvents();
                   }}
-                  className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition shadow-2xs cursor-pointer active:scale-95"
-                  title="Refresh Events"
+                  title="Refresh events"
+                  aria-label="Refresh events"
+                  className="w-9 h-9 rounded-[8px] border border-[#E5E7EB] bg-white text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] active:bg-[#F3F4F6] flex items-center justify-center transition-colors cursor-pointer shrink-0"
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="w-4 h-4 stroke-[1.5]" />
                 </button>
               </div>
             </div>
 
-            {/* Events Management Table Container */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
+            {/* Event Management Table */}
+            <Table>
               {eventsLoading ? (
-                <div className="py-24 text-center text-slate-400">
-                  <RefreshCw className="w-8 h-8 animate-spin mx-auto text-slate-900 mb-2" />
-                  <span className="text-sm font-medium">Loading campus event listings...</span>
-                </div>
+                <TableLoadingState message="Loading campus events..." />
               ) : filteredEvents.length === 0 ? (
-                <div className="py-20 text-center text-slate-400">
-                  <Calendar className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                  <p className="text-base font-bold text-slate-700">No Events Found</p>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Try adjusting your search criteria or arena category filter.
-                  </p>
-                </div>
+                <TableEmptyState
+                  icon={Calendar}
+                  title="No events found"
+                  description="No events match your current filter or search criteria."
+                  action={
+                    (eventSearch || eventCategoryFilter !== 'all' || eventStatusFilter !== 'all') && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setEventSearch('');
+                          setEventCategoryFilter('all');
+                          setEventStatusFilter('all');
+                        }}
+                      >
+                        Reset filters
+                      </Button>
+                    )
+                  }
+                />
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50/80 text-slate-600 font-bold border-b border-slate-200 text-xs uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Event Details</th>
-                        <th className="py-3.5 px-4">Arena Section</th>
-                        <th className="py-3.5 px-4">Date &amp; Time</th>
-                        <th className="py-3.5 px-4">Campus Venue</th>
-                        <th className="py-3.5 px-4">Attendance</th>
-                        <th className="py-3.5 px-4">Status</th>
-                        <th className="py-3.5 px-6 text-right">Actions</th>
+                <>
+                  <table className="w-full text-left border-collapse">
+                    <TableHeader>
+                      <tr>
+                        <TableHead>Event</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Date &amp; Time</TableHead>
+                        <TableHead>Venue</TableHead>
+                        <TableHead>Attendance</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead align="right">Actions</TableHead>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredEvents.map((ev) => {
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedEvents.map((ev) => {
                         const eventDateObj = new Date(ev.dateTime);
                         const dateFormatted = eventDateObj.toLocaleDateString('en-US', {
                           month: 'short',
@@ -579,10 +545,18 @@ export default function AdminDashboardPage() {
                           Math.round(((ev.registeredCount || 0) / (ev.capacity || 1)) * 100)
                         );
 
+                        // Progress bar color: neutral dark navy normally, turns amber over 80%, red at 100%
+                        let progressBarColor = 'bg-[#0F172A]';
+                        if (ev.status === 'FULL' || capacityPercent >= 100) {
+                          progressBarColor = 'bg-[#EF4444]'; // Red
+                        } else if (capacityPercent >= 80) {
+                          progressBarColor = 'bg-[#F59E0B]'; // Amber
+                        }
+
                         return (
-                          <tr key={ev._id} className="hover:bg-slate-50/70 transition-colors">
-                            {/* Thumbnail & Title */}
-                            <td className="py-3.5 px-6">
+                          <TableRow key={ev._id}>
+                            {/* Event Column: 40px rounded-6 thumbnail, title, one-line description */}
+                            <TableCell className="max-w-[280px]">
                               <div className="flex items-center gap-3">
                                 <img
                                   src={ev.imageUrl}
@@ -592,107 +566,138 @@ export default function AdminDashboardPage() {
                                     e.target.src =
                                       'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80';
                                   }}
-                                  className="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs"
+                                  className="w-10 h-10 rounded-[6px] object-cover shrink-0 border border-[#E5E7EB]"
                                 />
-                                <div className="min-w-0 max-w-[280px]">
+                                <div className="min-w-0 flex-1">
                                   <Link
                                     to={`/events/${ev._id}`}
                                     target="_blank"
-                                    className="font-bold text-slate-900 hover:text-blue-600 truncate block text-sm transition flex items-center gap-1 group"
+                                    rel="noopener noreferrer"
+                                    title={ev.title}
+                                    className="font-medium text-[13px] text-[#111827] hover:text-[#0F172A] truncate block transition-colors group"
                                   >
                                     <span className="truncate">{ev.title}</span>
-                                    <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 shrink-0" />
                                   </Link>
-                                  <span className="text-xs text-slate-500 font-medium truncate block mt-0.5">
+                                  <span
+                                    title={ev.description}
+                                    className="text-[12px] text-[#6B7280] font-normal truncate block mt-0.5"
+                                  >
                                     {ev.description}
                                   </span>
                                 </div>
                               </div>
-                            </td>
+                            </TableCell>
 
-                            {/* Arena Category */}
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              {renderCategoryBadge(ev.category)}
-                            </td>
+                            {/* Category Column: Plain neutral gray text-only tag */}
+                            <TableCell className="whitespace-nowrap">
+                              <CategoryBadge category={ev.category} />
+                            </TableCell>
 
-                            {/* Date & Time */}
-                            <td className="py-3.5 px-4 whitespace-nowrap text-xs">
-                              <span className="font-semibold text-slate-900 block">{dateFormatted}</span>
-                              <span className="text-slate-500 font-medium flex items-center gap-1 mt-0.5">
-                                <Clock className="w-3 h-3 text-slate-400 shrink-0" />
+                            {/* Date & Time Column: Tabular numbers, date on line one, time on line two in gray */}
+                            <TableCell className="whitespace-nowrap">
+                              <span className="text-[13px] font-medium text-[#111827] tabular-nums block">
+                                {dateFormatted}
+                              </span>
+                              <span className="text-[12px] text-[#6B7280] tabular-nums block mt-0.5">
                                 {timeFormatted}
                               </span>
-                            </td>
+                            </TableCell>
 
-                            {/* Venue */}
-                            <td className="py-3.5 px-4 whitespace-nowrap text-xs">
-                              <span className="flex items-center gap-1.5 font-semibold text-slate-700 max-w-[190px]">
-                                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                <span className="truncate">{ev.venue}</span>
+                            {/* Venue Column: Plain text, truncated, no pin icon */}
+                            <TableCell className="whitespace-nowrap">
+                              <span
+                                title={ev.venue}
+                                className="text-[13px] text-[#111827] font-normal truncate max-w-[170px] block"
+                              >
+                                {ev.venue}
                               </span>
-                            </td>
+                            </TableCell>
 
-                            {/* Attendance / Capacity */}
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              <div className="w-32">
-                                <div className="flex justify-between text-xs font-bold text-slate-800 mb-1">
-                                  <span>{ev.registeredCount || 0} / {ev.capacity}</span>
-                                  <span className="text-slate-500 font-semibold text-[11px]">{capacityPercent}%</span>
+                            {/* Attendance Column: "75 / 120" with slim 4px progress bar */}
+                            <TableCell className="whitespace-nowrap">
+                              <div className="w-28">
+                                <div className="flex items-center justify-between text-[13px] font-medium tabular-nums text-[#111827] mb-1">
+                                  <span>
+                                    {ev.registeredCount || 0} / {ev.capacity}
+                                  </span>
+                                  <span className="text-[11px] text-[#6B7280] font-normal">
+                                    {capacityPercent}%
+                                  </span>
                                 </div>
-                                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="w-full h-1 bg-[#F3F4F6] rounded-full overflow-hidden">
                                   <div
-                                    className={`h-full rounded-full transition-all duration-500 ${
-                                      ev.status === 'FULL'
-                                        ? 'bg-rose-500'
-                                        : ev.status === 'PAST'
-                                        ? 'bg-slate-400'
-                                        : 'bg-slate-900'
-                                    }`}
+                                    className={`h-full rounded-full transition-all duration-300 ${progressBarColor}`}
                                     style={{ width: `${capacityPercent}%` }}
                                   />
                                 </div>
                               </div>
-                            </td>
+                            </TableCell>
 
-                            {/* Status */}
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              <StatusBadge status={ev.status} seatsLeft={ev.seatsLeft} />
-                            </td>
+                            {/* Status Column: 6px colored dot + text */}
+                            <TableCell className="whitespace-nowrap">
+                              <StatusBadge
+                                status={ev.status}
+                                seatsLeft={ev.seatsLeft}
+                                capacity={ev.capacity}
+                                registeredCount={ev.registeredCount}
+                              />
+                            </TableCell>
 
-                            {/* Actions */}
-                            <td className="py-3.5 px-6 text-right whitespace-nowrap">
-                              <div className="flex items-center justify-end gap-1.5">
+                            {/* Actions Column: Three 32px ghost icon buttons (View, Edit, Delete) */}
+                            <TableCell align="right" className="whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1">
                                 <button
+                                  type="button"
                                   onClick={() => handleOpenRoster(ev)}
-                                  className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+                                  aria-label={`View attendee roster for ${ev.title}`}
                                   title="View Attendee Roster"
+                                  className="w-8 h-8 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                  <Eye className="w-4 h-4" />
+                                  <Eye className="w-4 h-4 stroke-[1.5]" />
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => handleOpenEdit(ev)}
-                                  className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+                                  aria-label={`Edit ${ev.title}`}
                                   title="Edit Event"
+                                  className="w-8 h-8 rounded-[6px] text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6] flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                  <Edit2 className="w-4 h-4" />
+                                  <Edit2 className="w-4 h-4 stroke-[1.5]" />
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => handleOpenDelete(ev)}
-                                  className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                                  aria-label={`Deactivate ${ev.title}`}
                                   title="Deactivate Event"
+                                  className="w-8 h-8 rounded-[6px] text-[#6B7280] hover:text-[#EF4444] hover:bg-[#FEF2F2] flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="w-4 h-4 stroke-[1.5]" />
                                 </button>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                    </tbody>
+                    </TableBody>
                   </table>
-                </div>
+
+                  {/* Pagination Footer */}
+                  <Pagination
+                    currentPage={eventPage}
+                    totalPages={totalEventPages}
+                    totalItems={filteredEvents.length}
+                    pageSize={eventPageSize}
+                    pageSizeOptions={[10, 25, 50]}
+                    onPageChange={(p) => setEventPage(p)}
+                    onPageSizeChange={(sz) => {
+                      setEventPageSize(sz);
+                      setEventPage(1);
+                    }}
+                    itemName="events"
+                  />
+                </>
               )}
-            </div>
+            </Table>
           </div>
         )}
 
@@ -702,91 +707,100 @@ export default function AdminDashboardPage() {
         {activeTab === 'registrations' && (
           <div className="space-y-4">
             {/* Registrations Toolbar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+                {/* Search query */}
                 <div className="relative w-full sm:w-72">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Search className="w-4 h-4" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#9CA3AF]">
+                    <Search className="w-4 h-4 stroke-[1.5]" />
                   </div>
                   <input
                     type="text"
                     value={regSearch}
                     onChange={(e) => setRegSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && fetchRegistrations()}
-                    placeholder="Search by student, email, or phone..."
-                    className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 transition font-medium"
+                    placeholder="Search by student, email, phone..."
+                    className="w-full h-9 pl-9 pr-8 text-[13px] rounded-[8px] border border-[#E5E7EB] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
                   />
+                  {regSearch && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRegSearch('');
+                        fetchRegistrations();
+                      }}
+                      className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#9CA3AF] hover:text-[#111827]"
+                      aria-label="Clear student search"
+                    >
+                      <X className="w-3.5 h-3.5 stroke-[1.5]" />
+                    </button>
+                  )}
                 </div>
 
+                {/* Event dropdown selector */}
                 <select
                   value={selectedEventId}
                   onChange={(e) => setSelectedEventId(e.target.value)}
-                  className="w-full sm:w-64 px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:border-slate-900 text-slate-700 font-medium"
+                  className="w-full sm:w-64 h-9 px-3 text-[13px] font-medium text-[#111827] bg-white border border-[#E5E7EB] rounded-[8px] focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] cursor-pointer"
                 >
-                  <option value="">All Campus Events ({events.length})</option>
+                  <option value="">All Events ({events.length})</option>
                   {events.map((ev) => (
                     <option key={ev._id} value={ev._id}>
-                      [{ev.category || 'Event'}] {ev.title} ({ev.registeredCount || 0} registered)
+                      [{ev.category || 'Event'}] {ev.title} ({ev.registeredCount || 0})
                     </option>
                   ))}
                 </select>
 
-                <button
-                  onClick={fetchRegistrations}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer"
-                >
+                <Button variant="secondary" size="md" onClick={fetchRegistrations}>
                   Search
-                </button>
+                </Button>
               </div>
 
+              {/* CSV Export & Record Counter */}
               <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                <span className="text-xs sm:text-sm text-slate-500 font-medium">
-                  Listed: <strong className="text-slate-900 font-bold">{registrations.length}</strong>
+                <span className="text-[13px] text-[#6B7280] tabular-nums">
+                  Total: <strong className="font-medium text-[#111827]">{registrations.length}</strong>
                 </span>
 
                 {registrations.length > 0 && (
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    icon={Download}
                     onClick={exportMasterCSV}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs hover:shadow-xs transition active:scale-95 cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Export CSV</span>
-                  </button>
+                    Export CSV
+                  </Button>
                 )}
               </div>
             </div>
 
             {/* Registrations Master Table */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
+            <Table>
               {regLoading ? (
-                <div className="py-24 text-center text-slate-400">
-                  <RefreshCw className="w-8 h-8 animate-spin mx-auto text-slate-900 mb-2" />
-                  <span className="text-sm font-medium">Loading student registration records...</span>
-                </div>
+                <TableLoadingState message="Loading attendee records..." />
               ) : registrations.length === 0 ? (
-                <div className="py-20 text-center text-slate-400">
-                  <Users className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                  <p className="text-base font-bold text-slate-700">No Registrations Found</p>
-                  <p className="text-sm text-slate-500 mt-1">
-                    No student registrations match the selected event or search filter.
-                  </p>
-                </div>
+                <TableEmptyState
+                  icon={Users}
+                  title="No registrations found"
+                  description="No student registration records match your filter criteria."
+                />
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50/80 text-slate-600 font-bold border-b border-slate-200 text-xs uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Student Attendee</th>
-                        <th className="py-3.5 px-4">Contact Details</th>
-                        <th className="py-3.5 px-4">Associated Event</th>
-                        <th className="py-3.5 px-4">Section</th>
-                        <th className="py-3.5 px-4">Registration Date</th>
-                        <th className="py-3.5 px-4">Ticket ID</th>
-                        <th className="py-3.5 px-6 text-right">Status</th>
+                <>
+                  <table className="w-full text-left border-collapse">
+                    <TableHeader>
+                      <tr>
+                        <TableHead>Student Attendee</TableHead>
+                        <TableHead>Contact Details</TableHead>
+                        <TableHead>Associated Event</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Registration Date</TableHead>
+                        <TableHead>Ticket ID</TableHead>
+                        <TableHead align="right">Status</TableHead>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {registrations.map((reg) => {
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedRegistrations.map((reg) => {
                         const regDate = new Date(reg.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -796,71 +810,88 @@ export default function AdminDashboardPage() {
                         });
 
                         return (
-                          <tr key={reg._id} className="hover:bg-slate-50/70 transition-colors">
-                            {/* Name */}
-                            <td className="py-3.5 px-6 font-bold text-slate-900">
+                          <TableRow key={reg._id}>
+                            {/* Student Attendee */}
+                            <TableCell className="font-medium text-[#111827]">
                               {reg.fullName}
-                            </td>
+                            </TableCell>
 
-                            {/* Contact info */}
-                            <td className="py-3.5 px-4 text-sm">
-                              <span className="block font-medium text-slate-800">{reg.email}</span>
-                              <span className="text-slate-500 font-medium text-xs block mt-0.5">
+                            {/* Contact Details */}
+                            <TableCell>
+                              <span className="text-[13px] font-normal text-[#111827] block">
+                                {reg.email}
+                              </span>
+                              <span className="text-[12px] text-[#6B7280] tabular-nums block mt-0.5">
                                 +91 {reg.contactNumber}
                               </span>
-                            </td>
+                            </TableCell>
 
-                            {/* Event details */}
-                            <td className="py-3.5 px-4 text-sm">
+                            {/* Associated Event */}
+                            <TableCell>
                               {reg.event ? (
                                 <div className="max-w-xs">
-                                  <span className="font-bold text-slate-900 block truncate">
+                                  <span className="font-medium text-[13px] text-[#111827] block truncate">
                                     {reg.event.title}
                                   </span>
-                                  <span className="text-slate-500 text-xs font-medium block truncate">
+                                  <span className="text-[12px] text-[#6B7280] block truncate mt-0.5">
                                     {reg.event.venue}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-slate-400 italic">Archived Event</span>
+                                <span className="text-[#9CA3AF] text-[13px] italic">Archived Event</span>
                               )}
-                            </td>
+                            </TableCell>
 
-                            {/* Section Category */}
-                            <td className="py-3.5 px-4 whitespace-nowrap">
-                              {renderCategoryBadge(reg.event?.category)}
-                            </td>
+                            {/* Category */}
+                            <TableCell className="whitespace-nowrap">
+                              <CategoryBadge category={reg.event?.category} />
+                            </TableCell>
 
-                            {/* Date */}
-                            <td className="py-3.5 px-4 text-slate-500 text-xs whitespace-nowrap font-medium">
+                            {/* Registration Date */}
+                            <TableCell className="whitespace-nowrap tabular-nums text-[13px] text-[#6B7280]">
                               {regDate}
-                            </td>
+                            </TableCell>
 
                             {/* Ticket ID */}
-                            <td className="py-3.5 px-4 font-mono text-xs text-slate-700 whitespace-nowrap">
-                              <span className="px-2.5 py-1 bg-slate-100 border border-slate-200/80 rounded-md font-semibold">
+                            <TableCell className="whitespace-nowrap font-mono text-[12px] text-[#374151]">
+                              <span className="px-1.5 py-0.5 rounded-[4px] bg-[#F3F4F6] border border-[#E5E7EB] tabular-nums">
                                 #REG-{reg._id ? reg._id.slice(-6).toUpperCase() : 'PASS'}
                               </span>
-                            </td>
+                            </TableCell>
 
                             {/* Status */}
-                            <td className="py-3.5 px-6 text-right whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
-                                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                            <TableCell align="right" className="whitespace-nowrap">
+                              <span className="inline-flex items-center text-[12px] font-medium text-[#374151]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] mr-2 shrink-0" />
                                 <span>Verified</span>
                               </span>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                    </tbody>
+                    </TableBody>
                   </table>
-                </div>
+
+                  {/* Pagination Footer */}
+                  <Pagination
+                    currentPage={regPage}
+                    totalPages={totalRegPages}
+                    totalItems={registrations.length}
+                    pageSize={regPageSize}
+                    pageSizeOptions={[10, 25, 50]}
+                    onPageChange={(p) => setRegPage(p)}
+                    onPageSizeChange={(sz) => {
+                      setRegPageSize(sz);
+                      setRegPage(1);
+                    }}
+                    itemName="attendees"
+                  />
+                </>
               )}
-            </div>
+            </Table>
           </div>
         )}
-      </div>
+      </main>
 
       {/* MODAL 1: Create / Edit Event */}
       <EventFormModal
@@ -873,7 +904,7 @@ export default function AdminDashboardPage() {
         onSaved={handleEventSaved}
       />
 
-      {/* MODAL 2: Delete Confirmation with data integrity warning */}
+      {/* MODAL 2: Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModalOpen}
         event={eventToDelete}
@@ -885,7 +916,7 @@ export default function AdminDashboardPage() {
         onConfirm={handleConfirmDelete}
       />
 
-      {/* MODAL 3: Event Attendee Roster */}
+      {/* MODAL 3: Event Attendee Roster Modal */}
       <EventRegistrationsModal
         isOpen={rosterModalOpen}
         event={rosterEvent}
