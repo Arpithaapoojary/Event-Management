@@ -162,6 +162,8 @@ Client will start on: **`http://localhost:5173`**
 | `POST` | `/api/admin/events` | Create a new event with input validation |
 | `PUT` | `/api/admin/events/:id` | Update an existing event |
 | `DELETE` | `/api/admin/events/:id` | Soft-delete event (sets `isDeleted: true`, preserves registrations) |
+| `POST` | `/api/admin/events/:id/restore` | Restore soft-deleted event to active status |
+| `POST` | `/api/admin/upload` | Upload local event banner image |
 | `GET` | `/api/admin/registrations` | View registrations across all events with search and event filter |
 | `GET` | `/api/admin/events/:id/registrations`| View attendee list for a specific event |
 
