@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
-  ShieldCheck,
   KeyRound,
   AlertCircle,
   ArrowRight,
   ArrowLeft,
   Loader2,
-  Sparkles,
   Eye,
   EyeOff,
-  CheckCircle2,
+  Lock,
 } from 'lucide-react';
 import api from '../../api/client';
 
@@ -22,14 +20,14 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(
-    isSessionExpired ? 'Session expired. Please enter passcode to sign in again.' : null
+    isSessionExpired ? 'Your session has ended. Please sign in again.' : null
   );
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!passcode.trim()) {
-      setError('Please enter the administrative passcode.');
+      setError('Please enter your coordinator passcode.');
       return;
     }
 
@@ -44,137 +42,121 @@ export default function AdminLoginPage() {
       }
     } catch (err) {
       setError(
-        err.message || 'Invalid administrative passcode. Please verify and try again.'
+        err.message || 'Invalid passcode. Please verify and try again.'
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const fillDemoPasscode = () => {
-    setPasscode('admin2026');
-    if (error) setError(null);
-  };
-
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-[#EDF5FB] px-4 py-12 font-sans selection:bg-slate-200">
-      <div className="w-full max-w-md">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-slate-50 px-4 py-12 font-sans selection:bg-slate-200">
+      <div className="w-full max-w-sm">
         {/* Navigation back to public portal */}
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-800 shadow-2xs hover:shadow-xs transition-all active:scale-95 group cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-slate-900 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to EventFlow</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to site</span>
           </Link>
-          <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400">
-            Institutional Console
+          <span className="text-[12px] font-medium text-slate-400">
+            Administrative Area
           </span>
         </div>
 
-        {/* Login Card Matching Platform Template */}
-        <div className="w-full bg-white rounded-[32px] border border-white/80 shadow-2xl overflow-hidden animate-modal-in">
-          {/* Header block (Matching Template) */}
-          <div className="bg-slate-950 px-8 py-7 text-white text-center relative">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFC700] text-slate-950 text-[11px] font-bold uppercase tracking-wider mb-2.5 shadow-2xs">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Administrative Access</span>
+        {/* Clean, Professional Authentication Card (Stripe / Linear standard) */}
+        <div className="w-full bg-white rounded-[12px] border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] p-7 sm:p-8">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="w-10 h-10 rounded-[8px] bg-slate-950 text-white flex items-center justify-center mb-4 shadow-2xs">
+              <Lock className="w-5 h-5 text-slate-200" />
             </div>
-            <h2 className="text-2xl font-bold font-display tracking-tight text-white">
-              Campus Event Operations
-            </h2>
-            <p className="text-xs text-slate-300 mt-1 font-normal">
-              Authorized coordinators &amp; institutional faculty login
+            <h1 className="text-[20px] font-bold text-slate-950 font-display tracking-tight">
+              Coordinator Portal
+            </h1>
+            <p className="text-[13px] text-slate-500 mt-1 leading-relaxed">
+              Sign in with your administrative passcode to manage campus events and registrations.
             </p>
           </div>
 
-          {/* Form Body */}
-          <div className="p-6 sm:p-8">
-            <form onSubmit={handleLogin} className="space-y-5">
-              {error && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold flex items-start gap-2.5 animate-shake">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Passcode input */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Coordinator Passcode <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <KeyRound className="w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={passcode}
-                    onChange={(e) => {
-                      setPasscode(e.target.value);
-                      if (error) setError(null);
-                    }}
-                    placeholder="Enter coordinator passcode"
-                    disabled={loading}
-                    className="w-full pl-10 pr-10 py-3 text-sm rounded-2xl border border-slate-200 bg-white focus:border-slate-950 focus:ring-4 focus:ring-slate-950/10 focus:outline-hidden transition-all text-slate-900 placeholder:text-slate-400"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition cursor-pointer"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Quick Demo Autofill Chip */}
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <button
-                    type="button"
-                    onClick={fillDemoPasscode}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-amber-500" />
-                    <span>Auto-fill Demo: <strong>admin2026</strong></span>
-                  </button>
-                  <span className="text-[11px] text-slate-400">Key Protected</span>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-black active:scale-98 text-white font-semibold text-sm transition-all shadow-md hover:shadow-xl disabled:opacity-60 cursor-pointer"
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {error && (
+              <div
+                role="alert"
+                className="p-3 rounded-[8px] bg-rose-50 border border-rose-200 text-rose-700 text-[13px] font-medium flex items-start gap-2.5"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Verifying Authorization...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Sign In to Coordinator Console</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-rose-600" />
+                <span className="leading-snug">{error}</span>
+              </div>
+            )}
 
-          {/* Card Footer */}
-          <div className="px-8 py-4 bg-slate-50/80 border-t border-slate-100 text-center text-[11px] text-slate-400 flex items-center justify-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Institutional Multi-Role Authentication Active</span>
-          </div>
+            <div>
+              <label
+                htmlFor="admin-passcode"
+                className="block text-[13px] font-medium text-slate-800 mb-1.5"
+              >
+                Passcode
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <KeyRound className="w-4 h-4" />
+                </div>
+                <input
+                  id="admin-passcode"
+                  type={showPassword ? 'text' : 'password'}
+                  value={passcode}
+                  onChange={(e) => {
+                    setPasscode(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  placeholder="Enter your passcode"
+                  disabled={loading}
+                  autoFocus
+                  autoComplete="current-password"
+                  className="w-full h-10 pl-10 pr-10 text-[14px] rounded-[8px] border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-slate-950/10 focus:border-slate-900 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                  aria-label={showPassword ? 'Hide passcode' : 'Show passcode'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !passcode.trim()}
+              className="w-full h-10 flex items-center justify-center gap-2 rounded-[8px] bg-slate-950 hover:bg-black active:bg-slate-950 text-white text-[14px] font-medium transition-colors shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-slate-950"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-300" />
+                  <span>Verifying...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
         </div>
+
+        {/* Discrete Subtitle */}
+        <p className="text-center text-[12px] text-slate-400 mt-6 font-normal">
+          EventFlow Campus Management System
+        </p>
       </div>
     </div>
   );
