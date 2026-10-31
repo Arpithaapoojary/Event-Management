@@ -1,268 +1,240 @@
-# Parrophins Event Management Web Application
+# EventFlow — Campus Event Management Platform
 
-> **Technical Assessment Submission for Parrophins Private Limited**  
-> A full-stack web application designed for institutions to organize, manage, and monitor events, while enabling students and attendees to browse available events and register seamlessly.
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
-
-## 1. Project Overview and Purpose
-The **Parrophins Event Management Web Application** is built to bridge the gap between event organizers and attendees. It provides:
-1. **Public Student / Attendee Portal**: Allows users to explore upcoming campus workshops, hackathons, and conferences with real-time seat tracking and dynamic status badges (`UPCOMING`, `FULL`, `PAST`), followed by quick registration with instant digital ticket passes.
-2. **Administrative Management Portal**: Offers institutional coordinators summary metrics, full event CRUD controls (with data-preserving soft deletion), and attendee roster tracking with real-time search.
-
----
-
-## 2. Features Implemented
-
-### **Module 1: Event Listing & Discovery**
-- **Catalog Grid**: Responsive cards displaying banner images, event titles, descriptions, venues, dates, and dynamic status badges.
-- **Dynamic Status & Real-Time Capacity**: Auto-calculates status based on datetime and registration count (`UPCOMING`, `FULL`, `PAST`).
-- **Interactive Search & Status Filtering**: Real-time filtering across titles, venues, and descriptions with quick tabs (`All`, `Upcoming`, `Open Seats`, `Past`).
-- **Event Detail Page**: Rich event hero banner, venue and schedule chips, live capacity progress bar, and description.
-
-### **Module 2: Event Registration**
-- **Registration Form Modal**: Clean modal with client-side validation for Full Name, Email, and Phone Number.
-- **Duplicate Prevention**: Compound unique indexing (`event + email`) rejects duplicate registrations with friendly `409 Conflict` feedback.
-- **Capacity & Date Guards**: Prevents registrations for past events or events that have reached maximum capacity.
-- **Atomic Counter**: Atomically updates `registeredCount` and `seatsLeft` without requiring a full page refresh.
-- **Digital Attendee Pass**: Displays confirmation details and unique Ticket Reference (`#REG-XXXXXX`).
-
-### **Module 3: Admin Dashboard & Summary Metrics**
-- **Key Metrics Overview**: Real-time dashboard cards tracking:
-  - Total Events
-  - Total Registrations
-  - Upcoming Events Count
-  - Full / At-Capacity Events
-- **Access Protection**: Admin route guard and passcode verification (`admin2026`) preventing unauthorized operations.
-
-### **Module 4: Event Management (Admin CRUD)**
-- **Create Event**: Form with validation for Title, Description, Date & Time (future date validation), Venue, Capacity, and Banner URL.
-- **Update Event**: Modify existing event details with validation ensuring capacity cannot be reduced below current registered attendees.
-- **Soft Deletion with Confirmation**: Destructive operations require confirmation. Events are soft-deleted (`isDeleted: true`), preserving historical registrations for institutional compliance.
-
-### **Module 5: Registration Management**
-- **Attendee Roster Modal**: View attendee details per event directly from the events table.
-- **Global Registrations Table**: Search registrations by attendee name, email, or contact number.
-- **Event Dropdown Filtering**: Filter registrations across all events or isolate a specific event.
+**EventFlow** is an enterprise-grade campus event operations and student pass management platform. It streamlines event publishing, real-time seat availability tracking, student registrations, digital pass issuing, and administrative roster analytics across collegiate departments.
 
 ---
 
-## 3. Technologies and Tools Used
+## Architecture & System Overview
 
-- **Frontend**:
-  - React 18 (Vite)
-  - Tailwind CSS (Utility-first styling)
-  - Lucide React (Icons)
-  - React Router v6 (Client-side routing)
-  - Axios (HTTP client with request interceptors)
-- **Backend**:
-  - Node.js & Express.js (REST API)
-  - Mongoose ODM (Data modeling & schemas)
-  - CORS, Dotenv
-  - Nodemon (Development server)
-- **Database**:
-  - MongoDB Atlas (Cloud database with replica sets and indexing)
-- **Version Control**:
-  - Git & GitHub
+EventFlow is architected as a high-performance decoupled full-stack application:
 
----
-
-## 4. Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
-- **MongoDB Atlas** account (or local MongoDB v6.0+)
-- Modern web browser (Chrome, Edge, Firefox, Safari)
-
----
-
-## 5. Installation and Setup Instructions
-
-### Clone the Repository
-```bash
-git clone https://github.com/Arpithaapoojary/Event-Management.git
-cd Event-Management
 ```
-
-### Install Backend Dependencies
-```bash
-cd server
-npm install
-```
-
-### Install Frontend Dependencies
-```bash
-cd ../client
-npm install
+Event-Management/
+├── client/                     # Frontend Single Page Application (SPA)
+│   ├── src/
+│   │   ├── api/                # Axios instance with auth interceptors & session guards
+│   │   ├── components/
+│   │   │   ├── admin/          # Coordinator console (CRUD modals, roster drawers, tables)
+│   │   │   ├── common/         # App shell, Navbar, simplified Footer
+│   │   │   ├── events/         # Event cards, ticket passes, registration modals
+│   │   │   └── home/           # Hero section, category showcase, stats
+│   │   ├── pages/              # Routing views (HomePage, EventDetailPage, AdminPortal)
+│   │   └── utils/              # Universal image URL resolution & canvas compression
+│   ├── public/                 # Static public assets
+│   └── vite.config.js          # Vite config with dev proxy configuration
+│
+└── server/                     # Backend REST API Service
+    ├── config/                 # MongoDB Atlas connection configuration
+    ├── controllers/            # Business logic (eventController, adminController)
+    ├── middleware/             # adminAuth, multipart upload, centralized error handling
+    ├── models/                 # Mongoose schemas (Event, Registration)
+    ├── routes/                 # Express API routes (/api/events, /api/admin)
+    └── utils/                  # Automated seeding scripts (seedRealData.js)
 ```
 
 ---
 
-## 6. Environment Variables Configuration
+## Core Capabilities
 
-Create a `.env` file in the `server/` directory:
+### 1. Attendee & Student Experience
+- **Interactive Event Discovery**: Categorized lineups spanning **Cultural**, **Technical**, and **Sports** events with real-time capacity meters and live countdowns.
+- **Dynamic Capacity Badging**: Intelligent status computation (`UPCOMING`, `OPEN TO ALL`, `X SEATS LEFT`, `REGISTRATION FULL`, `CONCLUDED`).
+- **One-Click Event Registration**: Streamlined signup modal with client-side regex phone and email validation, preventing duplicate applications per attendee.
+- **Digital Attendee Pass**: Real-time generation of digital admission passes with verification barcodes and unique registration reference codes (`#REG-XXXXXX`).
+
+### 2. Coordinator & Operations Dashboard
+- **Executive Overview Console**: High-density metrics tracking total active events, total confirmed attendees, upcoming schedule lineups, and full-capacity events.
+- **Schedule Management**: Full CRUD operations with future-date constraints, capacity protection guards, and multi-tier category tagging.
+- **Visual Banner Engine**: In-browser automatic canvas image compression (1200px max, ~150KB), live instant photo preview, preset campus themes, and CDN URL support.
+- **Attendee Roster Management**: Real-time roster search across attendees, event-specific filtering, and one-click verified CSV export for campus security checkpoints.
+- **Audit-Safe Soft Deletion**: Deleting events safely archives records (`isDeleted: true`), preserving historical registration rosters for institutional audit compliance while isolating them from the public lineup.
+
+### 3. Security & Data Integrity
+- **Role-Based Access Control**: Administrative routes protected by token verification (`x-admin-key`).
+- **Session Auto-Termination**: Automatic credential cleanup on administrative exit to prevent shared workstation unauthorized access.
+- **Race Condition Prevention**: Atomic increment operations (`$inc: { registeredCount: 1 }`) ensuring zero overbooking at peak registration rushes.
+- **Compound Unique Constraints**: Database-level compound indexes (`{ event: 1, email: 1 }`) rejecting duplicate submissions.
+
+---
+
+## Tech Stack
+
+| Domain | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend Framework** | React 18 & Vite | Fast SPA bundling, hot module replacement, and client-side routing |
+| **Styling** | Tailwind CSS & PostCSS | Responsive design system with custom design tokens |
+| **Typography** | Inter & Outfit Display | Modern executive typography and balanced readability |
+| **Icons** | Lucide React | Clean, monoline iconography |
+| **HTTP Client** | Axios | Configured with request/response interceptors and error normalization |
+| **Backend Framework** | Node.js & Express.js | Modular RESTful API architecture |
+| **Database & ODM** | MongoDB Atlas & Mongoose | Cloud document database with replica sets, schemas, and compound indexes |
+| **File Handling** | Multer & HTML5 Canvas | Client-side optimization and server-side multipart storage |
+| **Deployment** | Vercel & Render | Cloud hosting with automated continuous deployment |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- **Node.js**: `v18.0.0` or higher
+- **npm**: `v9.0.0` or higher
+- **MongoDB Atlas** cluster or local MongoDB instance
+
+---
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Arpithaapoojary/Event-Management.git
+   cd Event-Management
+   ```
+
+2. **Install Server Dependencies:**
+   ```bash
+   cd server
+   npm install
+   ```
+
+3. **Install Client Dependencies:**
+   ```bash
+   cd ../client
+   npm install
+   ```
+
+---
+
+### Environment Configuration
+
+Create a `.env` file inside the `server/` directory:
 
 ```env
 PORT=5000
 NODE_ENV=development
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.lqymip6.mongodb.net/event_management?retryWrites=true&w=majority
-JWT_SECRET=parrophins_event_secret_key_2026
+JWT_SECRET=eventflow_secret_key_2026
 ADMIN_KEY=admin2026
 ```
 
-> **Note**: A reference template is provided at [`server/.env.example`](file:///c:/Event%20Management/server/.env.example).
+> **Note**: A reference template is available at [`server/.env.example`](server/.env.example).
 
 ---
 
-## 7. Instructions for Running Locally
+### Running the Application Locally
 
-### Step 1: Start Backend Server
-Open a terminal and run:
+#### 1. Start the Backend API Service
 ```bash
 cd server
 npm run dev
 ```
-Backend will start on: **`http://localhost:5000`**
+*API will run on **`http://localhost:5000`***
 
-### Step 2: (Optional) Seed Sample Events
-To populate initial sample events:
+#### 2. Seed Realistic Event & Registration Data (Optional)
+To initialize the database with 9 balanced events and real student registrations:
 ```bash
 cd server
-node utils/seed.js
+node utils/seedRealData.js
 ```
 
-### Step 3: Start Frontend Client
-Open a second terminal and run:
+#### 3. Start the Frontend Client
 ```bash
 cd client
 npm run dev
 ```
-Client will start on: **`http://localhost:5173`**
-
-### Admin Credentials
-- Navigate to **`http://localhost:5173/admin`**
-- Passcode: **`admin2026`**
+*Application will open at **`http://localhost:5173`***
 
 ---
 
-## 8. API Endpoint Documentation
+## API Reference
 
 ### Public Endpoints
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/health` | Service health status check |
-| `GET` | `/api/events` | List all non-deleted events. Supports `?status=upcoming\|open\|past` and `?search=query` |
-| `GET` | `/api/events/:id` | Fetch details of a single event |
-| `POST` | `/api/events/:id/register` | Register attendee (`fullName`, `email`, `contactNumber`) with duplicate/capacity validation |
+| `GET` | `/api/health` | System health check and uptime status |
+| `GET` | `/api/events` | Retrieve active events with optional `category` and `search` filters |
+| `GET` | `/api/events/:id` | Retrieve comprehensive event details |
+| `POST` | `/api/events/:id/register` | Register an attendee with duplicate and capacity validation |
 
-### Admin Endpoints (Requires `x-admin-key: admin2026` or `Authorization: Bearer admin2026`)
+### Coordinator Endpoints (Protected by `x-admin-key`)
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/admin/login` | Verify admin passcode and receive access token |
-| `GET` | `/api/admin/stats` | Aggregated dashboard metrics (total events, registrations, upcoming, full) |
-| `POST` | `/api/admin/events` | Create a new event with input validation |
-| `PUT` | `/api/admin/events/:id` | Update an existing event |
-| `DELETE` | `/api/admin/events/:id` | Soft-delete event (sets `isDeleted: true`, preserves registrations) |
-| `POST` | `/api/admin/events/:id/restore` | Restore soft-deleted event to active status |
-| `POST` | `/api/admin/upload` | Upload local event banner image |
-| `GET` | `/api/admin/registrations` | View registrations across all events with search and event filter |
-| `GET` | `/api/admin/events/:id/registrations`| View attendee list for a specific event |
+| `POST` | `/api/admin/login` | Verify passcode and issue coordinator session token |
+| `GET` | `/api/admin/stats` | Retrieve aggregated dashboard KPI metrics |
+| `GET` | `/api/admin/events` | List all events (including soft-deleted archives) |
+| `POST` | `/api/admin/events` | Publish a new event with input validation |
+| `PUT` | `/api/admin/events/:id` | Update existing event details and seating limits |
+| `DELETE` | `/api/admin/events/:id` | Soft-delete an event while preserving registration history |
+| `POST` | `/api/admin/events/:id/restore` | Restore an archived event back to active schedule |
+| `POST` | `/api/admin/upload` | Upload event banner image asset |
+| `GET` | `/api/admin/registrations` | Fetch attendee rosters across all events with search and filters |
+| `GET` | `/api/admin/events/:id/registrations` | Fetch attendee list for a specific event |
 
 ---
 
-## 9. Database Schema Overview
+## Data Models
 
-### 1. `Event` Model (`server/models/Event.js`)
-| Field | Type | Attributes |
-| :--- | :--- | :--- |
-| `title` | String | Required, Trim, Min 3, Max 150 |
-| `description` | String | Required, Trim, Max 3000 |
-| `dateTime` | Date | Required |
-| `venue` | String | Required, Trim |
-| `capacity` | Number | Required, Min 1 |
-| `registeredCount` | Number | Default: 0, Min 0 |
-| `imageUrl` | String | Default Unsplash event banner |
-| `isDeleted` | Boolean | Default: false, Indexed for soft-delete |
-| *Virtual: `status`* | String | Computes `'UPCOMING'`, `'FULL'`, or `'PAST'` |
-| *Virtual: `seatsLeft`*| Number | Computes `max(0, capacity - registeredCount)` |
+### `Event` Schema
+```javascript
+{
+  title: { type: String, required: true, trim: true, minlength: 3, maxlength: 150 },
+  description: { type: String, required: true, trim: true, maxlength: 3000 },
+  dateTime: { type: Date, required: true },
+  venue: { type: String, required: true, trim: true },
+  capacity: { type: Number, required: true, min: 1 },
+  registeredCount: { type: Number, default: 0, min: 0 },
+  imageUrl: { type: String, default: '...' },
+  category: { type: String, enum: ['Cultural', 'Technical', 'Sports', 'Other'], default: 'Cultural' },
+  isDeleted: { type: Boolean, default: false, index: true },
+  deletedAt: { type: Date, default: null }
+}
+```
 
-### 2. `Registration` Model (`server/models/Registration.js`)
-| Field | Type | Attributes |
-| :--- | :--- | :--- |
-| `event` | ObjectId | Ref: `'Event'`, Required, Index |
-| `fullName` | String | Required, Trim, Min 2, Max 100 |
-| `email` | String | Required, Trim, Lowercase, Regex validated |
-| `contactNumber` | String | Required, Trim, Regex validated |
-| `createdAt` | Date | Timestamp |
-| **Index** | `{ event: 1, email: 1 }` | **Compound Unique Index** (Prevents duplicate registrations) |
-
-#### Approach to Deleted Events & Data Consistency (Soft Delete Decision)
-EventFlow strictly adheres to an **institutional soft-deletion strategy**:
-- **Why Soft Delete?**: Hard-deleting events would sever foreign-key relationships, orphan student attendee tickets, destroy audit trails, and risk irreversible data loss if an event was deleted accidentally.
-- **Implementation**: Deleting an event sets `isDeleted: true` and records a `deletedAt` timestamp (with virtual status `'CANCELLED'`).
-- **Catalog & Stats Isolation**: Soft-deleted events are automatically excluded from the public student portal, from default admin event lists, and from active KPI metrics (`Total Events`, `Upcoming Events`, and active `Total Registrations`).
-- **Archival Integrity**: Student registrations associated with soft-deleted events are safely preserved, marked with a clear `Event deleted` archive label, and locked into read-only mode for audit compliance.
-- **Auditing & Restoration**: Institutional administrators can toggle `"Show Deleted"` in the Event Management table to audit deactivated events or restore an event with a single click via `POST /api/admin/events/:id/restore`.
-- **Capacity Safety**: Updating an event never detaches registrations; capacity validation guarantees that capacity cannot be reduced below the current number of confirmed attendees.
+### `Registration` Schema
+```javascript
+{
+  event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true, index: true },
+  fullName: { type: String, required: true, trim: true, minlength: 2, maxlength: 100 },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  contactNumber: { type: String, required: true, trim: true }
+}
+// Compound unique index: { event: 1, email: 1 }
+```
 
 ---
 
-## 10. Enterprise Architecture & Security Overview
+## Production Deployment
 
-### 1. Authentication and Access Control Approach
-- **Server-Side Enforcement**: All administrative API endpoints (`/api/admin/*`) require server-side token verification via `adminAuth` middleware. Security is enforced on the backend, not solely by hiding UI buttons.
-- **401 Unauthorized vs. 403 Forbidden**:
-  - Missing token credentials immediately return `401 Unauthorized`, triggering automatic client-side session expiry redirection to `/admin/login?reason=expired`.
-  - Present but invalid or unauthorized tokens return `403 Forbidden`, routing the user to a dedicated enterprise 403 page (`/admin/forbidden`).
-- **User Session Menu**: Replaced consumer badges with an enterprise user menu displaying administrator avatar initials (`EC`), user role (`Coordinator / Administrator`), and a secure `Sign Out` action.
+### Frontend (Vercel)
+1. Import repository into [Vercel](https://vercel.com).
+2. Set **Root Directory** to `client`.
+3. Set **Framework Preset** to `Vite`.
+4. Add Environment Variable:
+   - `VITE_API_URL`: `https://<your-backend-domain>.onrender.com/api`
+5. Click **Deploy**.
 
-### 2. Validation Rules (Client and Server)
-- **Field Whitelist & Whitespace**: Required fields (`title`, `description`, `dateTime`, `venue`, `capacity`) cannot be empty or whitespace-only.
-- **String Length Limits**: Title is restricted to a maximum of 120 characters; Description is restricted to a maximum of 1,000 characters. Character counters provide instant visual feedback.
-- **Date Guards**: Date and start time must be valid ISO dates. For newly created events, past dates are strictly rejected on both client and server.
-- **Headcount & Capacity Validation**: Capacity must be a positive integer (`>= 1`). When updating existing events, capacity cannot be reduced below the count of existing confirmed attendees (`registeredCount`).
-- **Accessible Inline Errors**: Form fields link error messages using `aria-describedby` and `role="alert"` in `text-red-600`. Submit buttons are disabled while form inputs are invalid or actively submitting.
-
----
-
-## 11. Known Limitations & Future Enhancements
-- **QR Code Check-In**: Generating scannable QR tickets for physical event check-in.
-- **Automated Email Confirmation**: Integrating Nodemailer / SendGrid for email ticket confirmations.
-- **Waitlist Support**: Adding automatic waitlists when an event reaches maximum capacity.
-
----
-
-## 12. Production Deployment Guide
-
-EventFlow is configured for instant cloud deployment:
-
-### **Backend Deployment: Render (Web Service)**
-1. Sign in to [Render](https://render.com) with your GitHub account.
-2. Click **New +** > **Web Service**.
-3. Select your repository: `Arpithaapoojary/Event-Management`.
-4. Configure service settings:
-   - **Root Directory**: `server`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-5. Under **Environment Variables**, add:
+### Backend (Render)
+1. Create a new **Web Service** on [Render](https://render.com).
+2. Connect your GitHub repository.
+3. Set **Root Directory** to `server`.
+4. Set **Build Command** to `npm install`.
+5. Set **Start Command** to `npm start`.
+6. Add Environment Variables:
    - `NODE_ENV`: `production`
-   - `MONGODB_URI`: `<your MongoDB Atlas connection string>`
-   - `JWT_SECRET`: `<any secure random string>`
-   - `ADMIN_KEY`: `admin2026`
-6. Click **Deploy Web Service**. Render will generate your backend URL (e.g., `https://event-management-api.onrender.com`).
+   - `MONGODB_URI`: `<your-production-mongodb-connection-string>`
+   - `JWT_SECRET`: `<secure-random-secret>`
+   - `ADMIN_KEY`: `<admin-passcode>`
+7. Click **Deploy Web Service**.
 
 ---
 
-### **Frontend Deployment: Vercel**
-1. Sign in to [Vercel](https://vercel.com) with your GitHub account.
-2. Click **Add New...** > **Project** and import `Event-Management`.
-3. In project settings:
-   - **Root Directory**: Click edit and select `client`.
-   - **Framework Preset**: `Vite` (auto-detected).
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Under **Environment Variables**, add:
-   - `VITE_API_URL`: `https://<your-render-backend-subdomain>.onrender.com/api`
-5. Click **Deploy**. Vercel will build and assign a live production URL (e.g., `https://event-management.vercel.app`) with automatic HTTPS and global edge CDN.
+## License
 
-
+This project is open-source and available under the [MIT License](LICENSE).

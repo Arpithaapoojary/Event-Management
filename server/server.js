@@ -25,7 +25,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Parrophins Event Management API is online and running.',
+    message: 'EventFlow Campus Event Management API is online and running.',
     timestamp: new Date().toISOString(),
   });
 });
