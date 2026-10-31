@@ -184,85 +184,77 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#EDF5FB] text-slate-900 pb-20 selection:bg-slate-200 selection:text-slate-900">
+    <div className="min-h-screen bg-[#EDF5FB] text-slate-900 pb-16 selection:bg-slate-200 selection:text-slate-900">
       {/* ======================================================== */}
       {/* 1. HERO SECTION WITH EVENT LINEUP & SIGNATURE 3 CARDS */}
       {/* ======================================================== */}
-      <section className="relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header - Exact matching layout from user's reference */}
+      <section className="relative pt-10 pb-8 px-4 sm:px-6">
+        <div className="max-w-[1200px] mx-auto">
+          {/* Section Header */}
           <div className="mb-6 sm:mb-8">
-            {/* Super-Kicker */}
-            <div className="mb-2">
-              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase text-slate-500 font-display break-words">
+            {/* Eyebrow Label (12px, letter-spacing 0.08em) */}
+            <div className="mb-1.5">
+              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans">
                 EXPLORE • ANNUAL CAMPUS EVENT 2026
               </span>
             </div>
 
-            {/* Balanced Display Headline: Event Lineup */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-display text-slate-950 tracking-tight leading-tight mb-3">
+            {/* Page Title: clamp(28px, 3vw, 40px), weight 700, line-height 1.15 */}
+            <h1 className="text-[clamp(28px,3vw,40px)] font-bold text-slate-950 leading-[1.15] mb-2 sm:mb-3 tracking-tight">
               Event Lineup
             </h1>
 
-            {/* Authentic Description */}
-            <p className="text-slate-600 text-sm sm:text-base max-w-2xl leading-relaxed font-normal">
+            {/* Hero Paragraph: 16px, line-height 1.6, max-width 560px */}
+            <p className="text-[16px] leading-[1.6] max-w-[560px] text-slate-600 font-normal">
               Step into the arena of creativity, skill, and performance as the campus comes alive with unforgettable events across cultural, technical, and sports arenas.
             </p>
           </div>
 
           {/* ======================================================== */}
-          {/* THE 3-CARD COMPOSITION (Proportional Laptop & Mobile Sizing) */}
+          {/* 3-CARD COMPOSITION (Compact, 16px radius, 180px visual) */}
           {/* ======================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {CATEGORY_CARDS.map((cat) => (
               <div
                 key={cat.id}
-                className="relative bg-white rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-white/70 flex flex-col justify-between overflow-hidden group"
+                className="relative bg-white rounded-[16px] p-4 shadow-2xs hover:shadow-md transition-all duration-200 border border-slate-200/90 flex flex-col justify-between overflow-hidden group"
               >
-                {/* Smooth Bottom Gradient matching reference */}
-                <div
-                  className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t ${cat.gradientClass} pointer-events-none rounded-b-[24px] sm:rounded-b-[28px]`}
-                />
-
-                {/* Upper Visual Container with Rounded Colored Plate */}
-                <div className="relative w-full h-44 sm:h-48 lg:h-52 flex items-center justify-center overflow-visible mb-3">
-                  {/* Colored Backdrop Block (Peach / Cyan / Amber) - inset so character pops out */}
+                {/* 180px Visual Container with 12px radius plate */}
+                <div className="relative w-full h-[180px] rounded-[12px] overflow-hidden bg-slate-50 flex items-center justify-center mb-3 shrink-0">
                   <div
-                    className={`absolute inset-x-3 top-2 bottom-3 rounded-2xl ${cat.plateColor} shadow-inner transition-transform duration-500 group-hover:scale-95`}
+                    className={`absolute inset-2 rounded-[10px] ${cat.plateColor} opacity-90 transition-transform duration-300 group-hover:scale-95`}
                   />
-
-                  {/* Character / Subject Illustration popping over the colored plate */}
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="relative z-10 max-h-44 sm:max-h-48 lg:max-h-52 w-auto object-contain transform group-hover:scale-105 transition-transform duration-500 mix-blend-multiply drop-shadow-xs"
+                    className="relative z-10 max-h-[165px] w-auto object-contain transform group-hover:scale-105 transition-transform duration-300 mix-blend-multiply drop-shadow-2xs"
                     loading="lazy"
                   />
                 </div>
 
                 {/* Card Content & Action Bar */}
                 <div className="relative z-10 text-center flex flex-col items-center">
-                  {/* Bright Golden-Yellow Pill Badge */}
-                  <span className="bg-[#FFC700] text-slate-950 font-black text-[11px] sm:text-xs px-3.5 py-1 rounded-full inline-block mb-2 shadow-2xs uppercase tracking-wider">
+                  {/* Badge: 11-12px, weight 600, padding 4px 10px */}
+                  <span className="bg-[#FFC700] text-slate-950 font-semibold text-[11px] sm:text-[12px] px-2.5 py-1 rounded-[6px] inline-block mb-2 uppercase tracking-wider">
                     {cat.badgeText}
                   </span>
 
-                  {/* Bold Display Card Title */}
-                  <h3 className="text-xl sm:text-2xl font-black font-display text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
+                  {/* Card Title: 20px, weight 600 */}
+                  <h3 className="text-[20px] font-semibold text-slate-950 tracking-tight mb-1 group-hover:text-black transition-colors">
                     {cat.title}
                   </h3>
 
-                  {/* Subtitle / Category info */}
-                  <p className="text-xs font-bold text-slate-600 mb-4 tracking-wide">
+                  {/* Card Subtitle: 14px */}
+                  <p className="text-[14px] font-normal text-slate-600 mb-3 tracking-normal">
                     {cat.categoryName}
                   </p>
 
-                  {/* Bottom Action Bar: Black Pill + Black Circle Pin */}
-                  <div className="w-full flex items-center gap-2.5">
+                  {/* Bottom Action Bar: 40px height, 8px radius, 14px font */}
+                  <div className="w-full flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
-                      className="flex-1 py-2.5 sm:py-3 px-4 rounded-full bg-slate-950 hover:bg-black text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer text-center"
+                      className="flex-1 h-10 px-4 rounded-[8px] bg-slate-950 hover:bg-black text-white font-medium text-[14px] transition-colors flex items-center justify-center text-center cursor-pointer active:scale-98"
                     >
                       View Details
                     </button>
@@ -271,9 +263,9 @@ export default function HomePage() {
                       type="button"
                       onClick={() => handleSelectCategory(cat.searchKeyword, cat.filterKeywords)}
                       title={`Venue: ${cat.venue}`}
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-slate-950 hover:bg-black text-white flex items-center justify-center shrink-0 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+                      className="w-10 h-10 rounded-[8px] bg-slate-950 hover:bg-black text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer active:scale-98"
                     >
-                      <MapPin className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
+                      <MapPin className="w-4 h-4 text-white" />
                     </button>
                   </div>
                 </div>
@@ -284,56 +276,53 @@ export default function HomePage() {
       </section>
 
       {/* ======================================================== */}
-      {/* 2. MAIN EVENTS DIRECTORY (SUB-EVENTS) */}
+      {/* 2. MAIN EVENTS DIRECTORY (SUB-EVENTS) - 48px Gap          */}
       {/* ======================================================== */}
-      <main id="events-directory" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
-        {/* Section Header matching main event section typography */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
+      <main id="events-directory" className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-12">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
-            {/* Super-Kicker */}
-            <div className="mb-2">
-              <span className="text-[11px] sm:text-xs font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase text-slate-500 font-display break-words">
+            <div className="mb-1.5">
+              <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-slate-500 font-sans">
                 ALL SUB-EVENTS • 2026 CAMPUS SCHEDULE
               </span>
             </div>
 
-            {/* Display Headline */}
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-950 tracking-tight leading-tight mb-2">
+            <h2 className="text-[clamp(22px,2.5vw,28px)] font-bold text-slate-950 tracking-tight leading-[1.2] mb-1.5">
               Live &amp; Upcoming Events
             </h2>
 
-            {/* Description */}
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl leading-relaxed font-normal">
+            <p className="text-[14px] sm:text-[15px] text-slate-600 max-w-[560px] leading-relaxed font-normal">
               Browse individual schedules, competitions, and reserve your registration pass.
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start md:self-end">
-            <span className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-2xs text-xs font-bold text-slate-700">
-              Showing <strong className="text-slate-950">{filteredEvents.length}</strong> of{' '}
-              <strong className="text-slate-950">{events.length}</strong> total events
+            <span className="px-3 py-1 rounded-[6px] bg-white border border-slate-200 text-[12px] font-medium text-slate-700">
+              Showing <strong className="text-slate-950 font-semibold">{filteredEvents.length}</strong> of{' '}
+              <strong className="text-slate-950 font-semibold">{events.length}</strong> total events
             </span>
           </div>
         </div>
 
-        {/* Selected Category Filter Banner (if user filtered via category card or pill) */}
+        {/* Selected Category Filter Banner */}
         {selectedCategory !== 'all' && (
-          <div className="mb-8 p-4 rounded-3xl bg-white border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs animate-hero-fade-in">
-            <div className="flex items-center gap-3">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-slate-900">
+          <div className="mb-6 p-3 sm:p-4 rounded-[12px] bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-[13px] sm:text-[14px] font-medium text-slate-900">
                 Filtered by category arena:{' '}
-                <span className="font-extrabold capitalize text-slate-950">
+                <span className="font-semibold capitalize text-slate-950">
                   {selectedCategory} Events
                 </span>
-                <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                <span className="ml-2 text-[12px] font-medium px-2 py-0.5 rounded-[4px] bg-slate-100 text-slate-600">
                   {filteredEvents.length} events
                 </span>
               </span>
             </div>
             <button
               onClick={handleClearFilter}
-              className="text-xs font-extrabold text-slate-700 hover:text-slate-950 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="text-[12px] font-medium text-slate-700 hover:text-slate-950 px-3 py-1.5 rounded-[6px] bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               Show All Arenas ✕
             </button>
@@ -341,10 +330,10 @@ export default function HomePage() {
         )}
 
         {/* Tabs and Quick Search Filter Bar */}
-        <div className="flex flex-col gap-5 mb-10">
-          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
-            {/* Arena Category Pills */}
-            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200/80 rounded-full shadow-2xs overflow-x-auto no-scrollbar shrink-0 max-w-full">
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            {/* Arena Category Tabs (40px height, 8px radius) */}
+            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-[8px] shadow-2xs overflow-x-auto no-scrollbar shrink-0 max-w-full">
               {[
                 { id: 'all', label: 'All Arenas', count: events.length },
                 { id: 'cultural', label: 'Cultural', count: culturalCount },
@@ -366,15 +355,15 @@ export default function HomePage() {
                         );
                       }
                     }}
-                    className={`px-4 sm:px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+                    className={`h-8 px-3 rounded-[6px] text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-slate-950 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-950'
+                        ? 'bg-slate-950 text-white'
+                        : 'text-slate-600 hover:text-slate-950 hover:bg-slate-50'
                     }`}
                   >
                     <span>{cat.label}</span>
                     <span
-                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      className={`text-[10px] font-medium px-1.5 py-0.2 rounded-[4px] ${
                         isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                       }`}
                     >
@@ -385,20 +374,20 @@ export default function HomePage() {
               })}
             </div>
 
-            {/* Search Input Box */}
-            <div className="relative w-full lg:w-80 shrink-0">
-              <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            {/* Search Input Box (40px height, 8px radius) */}
+            <div className="relative w-full sm:w-72 shrink-0">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by event, category, venue..."
-                className="w-full pl-11 pr-10 py-2.5 rounded-full bg-white border border-slate-200/90 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-slate-950 text-slate-900 shadow-2xs placeholder-slate-400"
+                placeholder="Search events..."
+                className="w-full h-10 pl-9 pr-8 rounded-[8px] bg-white border border-slate-200 text-[14px] font-normal focus:outline-hidden focus:ring-1 focus:ring-slate-950 text-slate-900 shadow-2xs placeholder:text-slate-400"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-medium"
                 >
                   ✕
                 </button>
@@ -408,8 +397,8 @@ export default function HomePage() {
 
           {/* Secondary Status Tabs */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Status:</span>
-            <div className="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-slate-200/60 overflow-x-auto no-scrollbar max-w-full">
+            <span className="text-[12px] font-medium text-slate-500 uppercase tracking-wider">Status:</span>
+            <div className="flex items-center gap-1 bg-white p-0.5 rounded-[6px] border border-slate-200 overflow-x-auto no-scrollbar max-w-full">
               {[
                 { id: 'all', label: 'All Status' },
                 { id: 'upcoming', label: 'Upcoming' },
@@ -418,9 +407,9 @@ export default function HomePage() {
                 <button
                   key={st.id}
                   onClick={() => setActiveTab(st.id)}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`h-7 px-2.5 rounded-[4px] text-[12px] font-medium transition-all cursor-pointer ${
                     activeTab === st.id
-                      ? 'bg-slate-950 text-white shadow-2xs'
+                      ? 'bg-slate-950 text-white'
                       : 'text-slate-600 hover:text-slate-950'
                   }`}
                 >
@@ -432,30 +421,30 @@ export default function HomePage() {
         </div>
 
         {/* ======================================================== */}
-        {/* EVENT CARDS GRID */}
+        {/* EVENT CARDS GRID (3 cols desktop, 2 cols tablet, 1 col mobile) */}
         {/* ======================================================== */}
         {loading ? (
-          <div className="py-24 text-center flex flex-col items-center justify-center">
-            <RefreshCw className="w-8 h-8 text-slate-600 animate-spin mb-4" />
-            <p className="text-slate-700 font-semibold text-sm">Loading campus events...</p>
+          <div className="py-20 text-center flex flex-col items-center justify-center">
+            <RefreshCw className="w-6 h-6 text-slate-600 animate-spin mb-3" />
+            <p className="text-slate-700 font-medium text-[14px]">Loading campus events...</p>
           </div>
         ) : error ? (
-          <div className="py-16 px-6 max-w-md mx-auto text-center bg-white rounded-3xl border border-rose-200 shadow-sm">
-            <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-900 mb-1">Failed to Load Events</h3>
-            <p className="text-xs text-slate-600 mb-4">{error}</p>
+          <div className="py-12 px-6 max-w-md mx-auto text-center bg-white rounded-[16px] border border-rose-200 shadow-xs">
+            <AlertCircle className="w-8 h-8 text-rose-500 mx-auto mb-2.5" />
+            <h3 className="text-[16px] font-semibold text-slate-900 mb-1">Failed to Load Events</h3>
+            <p className="text-[13px] text-slate-600 mb-4">{error}</p>
             <button
               onClick={fetchEvents}
-              className="px-5 py-2.5 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all cursor-pointer shadow-xs"
+              className="h-9 px-4 rounded-[8px] bg-slate-900 text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer"
             >
               Try Again
             </button>
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-3xl border border-slate-200/80 p-8 shadow-xs">
-            <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-900 mb-1">No Events Found</h3>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mb-5">
+          <div className="py-16 text-center bg-white rounded-[16px] border border-slate-200 p-8 shadow-2xs">
+            <Calendar className="w-10 h-10 text-slate-400 mx-auto mb-2.5" />
+            <h3 className="text-[16px] font-semibold text-slate-900 mb-1">No Events Found</h3>
+            <p className="text-[13px] text-slate-500 max-w-md mx-auto mb-4">
               {searchQuery
                 ? `No events matching "${searchQuery}". Try clearing search filters.`
                 : 'No events currently registered in this tab.'}
@@ -463,14 +452,14 @@ export default function HomePage() {
             {(searchQuery || selectedCategoryFilter) && (
               <button
                 onClick={handleClearFilter}
-                className="px-5 py-2.5 rounded-full bg-slate-950 text-white text-xs font-bold hover:bg-black transition-all cursor-pointer shadow-xs"
+                className="h-9 px-4 rounded-[8px] bg-slate-950 text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer"
               >
                 Reset All Filters
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => (
               <EventCard key={event._id || event.id} event={event} />
             ))}

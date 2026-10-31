@@ -7,8 +7,8 @@ export default function Footer() {
   if (location.pathname === '/admin') return null;
 
   return (
-    <footer className="mt-auto border-t border-slate-200/80 bg-white py-8 text-xs text-slate-500 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+    <footer className="mt-auto border-t border-slate-200/80 bg-white py-6 text-xs text-slate-500 font-sans">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         <div>
           <span className="font-bold text-slate-900 text-sm">EventFlow</span>
           <p className="mt-1 text-slate-500">

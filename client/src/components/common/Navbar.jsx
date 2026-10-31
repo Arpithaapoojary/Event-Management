@@ -82,66 +82,66 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#EDF5FB]/95 border-b border-sky-200/60 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Name */}
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Brand Name (20-22px) */}
         <Link
           to="/"
           onClick={() => setMobileMenuOpen(false)}
           className="flex items-center group cursor-pointer"
         >
-          <span className="font-black text-2xl font-display tracking-tight text-slate-950 group-hover:text-black transition-colors">
+          <span className="font-bold text-[21px] tracking-tight text-slate-950 group-hover:text-black transition-colors">
             EventFlow
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+        {/* Desktop Navigation Links (14px font-medium, 24px gap) */}
+        <nav className="hidden md:flex items-center gap-6">
           <button
             type="button"
             onClick={scrollToEvents}
-            className="px-3.5 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all cursor-pointer"
+            className="text-[14px] font-medium text-slate-700 hover:text-slate-950 transition-colors cursor-pointer"
           >
             All Events
           </button>
           <button
             type="button"
             onClick={() => navigateToCategory('cultural')}
-            className="px-3 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all cursor-pointer"
+            className="text-[14px] font-medium text-slate-700 hover:text-slate-950 transition-colors cursor-pointer"
           >
             Cultural
           </button>
           <button
             type="button"
             onClick={() => navigateToCategory('technical')}
-            className="px-3 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all cursor-pointer"
+            className="text-[14px] font-medium text-slate-700 hover:text-slate-950 transition-colors cursor-pointer"
           >
             Technical
           </button>
           <button
             type="button"
             onClick={() => navigateToCategory('sports')}
-            className="px-3 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 transition-all cursor-pointer"
+            className="text-[14px] font-medium text-slate-700 hover:text-slate-950 transition-colors cursor-pointer"
           >
             Sports
           </button>
         </nav>
 
-        {/* Right Desktop Actions */}
+        {/* Right Desktop Actions (36-40px height, 8px radius, 14px font) */}
         <div className="hidden md:flex items-center gap-3">
           {hasAdminToken ? (
             <Link
               to="/admin"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-slate-900 bg-white border border-slate-300 shadow-xs hover:bg-slate-50 transition-all"
+              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-[8px] text-[14px] font-medium text-slate-900 bg-white border border-slate-300 shadow-2xs hover:bg-slate-50 transition-colors"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-700" />
+              <ShieldCheck className="w-4 h-4 text-slate-700" />
               <span>Admin Console</span>
             </Link>
           ) : (
             <Link
               to="/admin/login"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-white/80 border border-slate-200 transition-all"
+              className="inline-flex items-center gap-1.5 h-10 px-4 rounded-[8px] text-[14px] font-medium text-slate-700 hover:text-slate-950 hover:bg-white/80 border border-slate-300 transition-colors"
             >
-              <Lock className="w-3.5 h-3.5 text-slate-500" />
+              <Lock className="w-4 h-4 text-slate-500" />
               <span>Coordinator Access</span>
             </Link>
           )}
@@ -149,7 +149,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={scrollToEvents}
-            className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all bg-slate-950 text-white hover:bg-black shadow-sm cursor-pointer active:scale-95"
+            className="h-10 px-4 rounded-[8px] text-[14px] font-medium transition-colors bg-slate-950 text-white hover:bg-black shadow-xs cursor-pointer active:scale-98"
           >
             Explore Events
           </button>
@@ -160,7 +160,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={scrollToEvents}
-            className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-950 text-white hover:bg-black transition-all cursor-pointer"
+            className="h-9 px-3 rounded-[8px] text-[13px] font-medium bg-slate-950 text-white hover:bg-black transition-colors cursor-pointer"
           >
             Explore Events
           </button>
@@ -169,7 +169,7 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle navigation menu"
-            className="p-2 rounded-xl text-slate-800 hover:bg-white/80 border border-slate-200 transition-all active:scale-95 cursor-pointer"
+            className="w-9 h-9 rounded-[8px] text-slate-800 hover:bg-white/80 border border-slate-200 flex items-center justify-center transition-colors cursor-pointer"
           >
             {mobileMenuOpen ? (
               <X className="w-5 h-5 stroke-[2]" />

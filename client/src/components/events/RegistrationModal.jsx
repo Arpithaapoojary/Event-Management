@@ -208,7 +208,7 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-hero-fade-in font-sans overflow-y-auto">
       {/* Modal Dialog with smooth entrance animation */}
       <div
-        className="relative w-full max-w-lg bg-white rounded-[24px] sm:rounded-[28px] shadow-2xl border border-white/60 overflow-hidden transform animate-modal-in transition-all max-h-[92vh] overflow-y-auto my-auto"
+        className="relative w-full max-w-md bg-white rounded-[16px] shadow-xl border border-slate-200 overflow-hidden transform animate-modal-in transition-all max-h-[92vh] overflow-y-auto my-auto"
         role="dialog"
         aria-modal="true"
       >
@@ -218,16 +218,16 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
           /* ======================================================== */
           <div>
             {/* Template Header (Dark with Golden Pill & Event Context) */}
-            <div className="relative px-6 sm:px-7 py-5 bg-slate-950 text-white">
+            <div className="relative px-5 py-4 bg-slate-950 text-white">
               <button
                 onClick={handleClose}
-                className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                className="absolute top-4 right-4 p-1.5 rounded-[6px] text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFC700] text-slate-950 text-[11px] font-bold uppercase tracking-wider mb-2 shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[6px] bg-[#FFC700] text-slate-950 text-[11px] font-semibold uppercase tracking-wider mb-1.5 shadow-2xs">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Registration Confirmed</span>
               </div>
@@ -351,23 +351,23 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
           /* ======================================================== */
           <div>
             {/* Template Header (Dark with Golden Pill & Event Context) */}
-            <div className="relative px-6 sm:px-7 py-5 bg-slate-950 text-white">
+            <div className="relative px-5 py-4 bg-slate-950 text-white">
               <button
                 onClick={handleClose}
-                className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                className="absolute top-4 right-4 p-1.5 rounded-[6px] text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFC700] text-slate-950 text-[11px] font-bold uppercase tracking-wider mb-2 shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[6px] bg-[#FFC700] text-slate-950 text-[11px] font-semibold uppercase tracking-wider mb-1.5 shadow-2xs">
                 <Ticket className="w-3.5 h-3.5" />
                 <span>Event Registration</span>
               </div>
-              <h3 className="text-lg font-bold text-white pr-8 line-clamp-1 leading-snug">
+              <h3 className="text-[16px] font-semibold text-white pr-8 line-clamp-1 leading-snug">
                 {event.title}
               </h3>
-              <p className="text-xs text-slate-300 flex items-center gap-3 mt-1.5 font-normal">
+              <p className="text-[12px] text-slate-300 flex items-center gap-3 mt-1 font-normal">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   {formattedDate}
@@ -380,22 +380,22 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
             </div>
 
             {/* Modal Body: Registration Form */}
-            <div className="p-6 sm:p-7">
-              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <div className="p-5">
+              <form onSubmit={handleSubmit} noValidate className="space-y-3.5">
                 {apiError && (
-                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2.5 animate-shake">
+                  <div className="p-3 rounded-[8px] bg-rose-50 border border-rose-200 text-rose-700 text-[13px] flex items-start gap-2 animate-shake">
                     <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span className="font-semibold">{apiError}</span>
+                    <span className="font-medium">{apiError}</span>
                   </div>
                 )}
 
                 {/* Full Name Field */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-[13px] font-medium text-slate-700 mb-1">
                     Full Name <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                       <User className="w-4 h-4" />
                     </div>
                     <input
@@ -406,15 +406,15 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                       onBlur={handleBlur}
                       placeholder="e.g. John Doe"
                       disabled={isSubmitting}
-                      className={`w-full pl-10 pr-4 py-3 text-sm rounded-2xl border bg-white focus:outline-hidden transition-all ${
+                      className={`w-full h-10 pl-9 pr-3 text-[14px] rounded-[8px] border bg-white focus:outline-hidden transition-colors ${
                         errors.fullName
-                          ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-4 focus:ring-rose-100'
-                          : 'border-slate-200 focus:border-slate-950 focus:ring-4 focus:ring-slate-950/10'
+                          ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-1 focus:ring-rose-500'
+                          : 'border-slate-200 focus:border-slate-950 focus:ring-1 focus:ring-slate-950'
                       }`}
                     />
                   </div>
                   {errors.fullName && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1 animate-hero-fade-in">
+                    <p className="text-[12px] text-rose-600 mt-1 font-medium flex items-center gap-1 animate-hero-fade-in">
                       <AlertCircle className="w-3 h-3" />
                       <span>{errors.fullName}</span>
                     </p>
@@ -423,11 +423,11 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
 
                 {/* Email Address Field */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-[13px] font-medium text-slate-700 mb-1">
                     Email Address <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                       <Mail className="w-4 h-4" />
                     </div>
                     <input
@@ -438,28 +438,28 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                       onBlur={handleBlur}
                       placeholder="e.g. alex@example.com"
                       disabled={isSubmitting}
-                      className={`w-full pl-10 pr-4 py-3 text-sm rounded-2xl border bg-white focus:outline-hidden transition-all ${
+                      className={`w-full h-10 pl-9 pr-3 text-[14px] rounded-[8px] border bg-white focus:outline-hidden transition-colors ${
                         errors.email
-                          ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-4 focus:ring-rose-100'
-                          : 'border-slate-200 focus:border-slate-950 focus:ring-4 focus:ring-slate-950/10'
+                          ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-1 focus:ring-rose-500'
+                          : 'border-slate-200 focus:border-slate-950 focus:ring-1 focus:ring-slate-950'
                       }`}
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1 animate-hero-fade-in">
+                    <p className="text-[12px] text-rose-600 mt-1 font-medium flex items-center gap-1 animate-hero-fade-in">
                       <AlertCircle className="w-3 h-3" />
                       <span>{errors.email}</span>
                     </p>
                   )}
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     One registration per email address is permitted for this event.
                   </p>
                 </div>
 
-                {/* Contact Number Field (India 10 Digit Validation + Dedicated +91 Addon) */}
+                {/* Contact Number Field */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-slate-700">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[13px] font-medium text-slate-700">
                       Contact Number (India) <span className="text-rose-500">*</span>
                     </label>
                     <span className="text-[11px] font-medium text-slate-400">
@@ -467,23 +467,20 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                     </span>
                   </div>
 
-                  {/* Clean Input Group: Dedicated prefix box eliminates overlap */}
                   <div
-                    className={`flex items-center rounded-2xl border transition-all overflow-hidden bg-white ${
+                    className={`flex items-center h-10 rounded-[8px] border transition-colors overflow-hidden bg-white ${
                       errors.contactNumber
-                        ? 'border-rose-400 bg-rose-50/20 ring-4 ring-rose-100'
+                        ? 'border-rose-400 bg-rose-50/20 ring-1 ring-rose-500'
                         : formData.contactNumber.length === 10 && !errors.contactNumber
-                        ? 'border-emerald-400 ring-4 ring-emerald-50'
-                        : 'border-slate-200 focus-within:border-slate-950 focus-within:ring-4 focus-within:ring-slate-950/10'
+                        ? 'border-emerald-500'
+                        : 'border-slate-200 focus-within:border-slate-950 focus-within:ring-1 focus-within:ring-slate-950'
                     }`}
                   >
-                    {/* Country Code Prefix Addon */}
-                    <div className="flex items-center gap-1.5 px-3.5 py-3 bg-slate-100/70 border-r border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold select-none shrink-0">
-                      <span className="text-base leading-none">🇮🇳</span>
-                      <span className="font-bold text-slate-900 tracking-wide">+91</span>
+                    <div className="flex items-center gap-1 px-2.5 h-full bg-slate-50 border-r border-slate-200 text-slate-700 text-[13px] font-semibold select-none shrink-0">
+                      <span>🇮🇳</span>
+                      <span>+91</span>
                     </div>
 
-                    {/* Clean 10-Digit Phone Input */}
                     <input
                       type="tel"
                       name="contactNumber"
@@ -493,42 +490,42 @@ export default function RegistrationModal({ event, isOpen, onClose, onSuccess })
                       maxLength={10}
                       placeholder="98765 43210"
                       disabled={isSubmitting}
-                      className="w-full px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 bg-transparent focus:outline-hidden tracking-wider font-normal"
+                      className="w-full px-3 text-[14px] text-slate-900 placeholder:text-slate-400 bg-transparent focus:outline-hidden tracking-wider font-normal"
                     />
 
                     {formData.contactNumber.length === 10 && !errors.contactNumber && (
-                      <div className="pr-3.5 text-emerald-500 shrink-0 animate-hero-fade-in">
+                      <div className="pr-2.5 text-emerald-500 shrink-0 animate-hero-fade-in">
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
                     )}
                   </div>
 
                   {errors.contactNumber ? (
-                    <p className="text-xs text-rose-600 mt-1 font-semibold flex items-center gap-1 animate-hero-fade-in">
+                    <p className="text-[12px] text-rose-600 mt-1 font-medium flex items-center gap-1 animate-hero-fade-in">
                       <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                       <span>{errors.contactNumber}</span>
                     </p>
                   ) : (
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-[11px] text-slate-400 mt-0.5">
                       Enter 10-digit Indian mobile number starting with 6, 7, 8, or 9.
                     </p>
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="pt-3 flex items-center justify-end gap-3">
+                {/* Action Buttons: 40px height, 8px radius */}
+                <div className="pt-3 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="px-5 py-3 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold text-xs sm:text-sm transition-all disabled:opacity-50 cursor-pointer"
+                    className="h-10 px-4 rounded-[8px] border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium text-[14px] transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-slate-950 hover:bg-black text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md active:scale-98 disabled:opacity-70 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-[8px] bg-slate-950 hover:bg-black text-white font-medium text-[14px] transition-colors shadow-2xs active:scale-98 disabled:opacity-70 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
