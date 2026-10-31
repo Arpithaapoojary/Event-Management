@@ -8,12 +8,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * - Sticky header with 12px uppercase tracking 0.04em 500
  * - Skeleton loading rows, minimal empty state
  */
-export function Table({ children, className = '' }) {
+export function Table({ children, footer, className = '' }) {
   return (
     <div
       className={`bg-white rounded-[8px] border border-[#E2E8F0] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.05)] ${className}`}
     >
-      <div className="overflow-x-auto">{children}</div>
+      <div className="overflow-x-auto w-full">{children}</div>
+      {footer}
     </div>
   );
 }
@@ -62,7 +63,7 @@ export function TableCell({ children, className = '', align = 'left', ...props }
   const alignClass = align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
   return (
     <td
-      className={`py-2 px-4 text-[14px] leading-[20px] text-[#0F172A] ${alignClass} ${className}`}
+      className={`py-3 px-4 text-[14px] leading-[20px] text-[#0F172A] align-middle ${alignClass} ${className}`}
       {...props}
     >
       {children}

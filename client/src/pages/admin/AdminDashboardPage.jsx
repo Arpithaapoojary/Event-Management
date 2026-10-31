@@ -552,8 +552,8 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Single-row Toolbar (Search, Category, Status, Refresh, Create Event) */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
-            <div className="flex flex-wrap items-center gap-2.5 flex-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-0">
               {/* Search input (left, 320px) */}
               <div className="relative w-full md:w-[320px]">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#64748B]">
@@ -632,7 +632,24 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Events Data Table */}
-          <Table>
+          <Table
+            footer={
+              !eventsLoading && filteredEvents.length > 0 ? (
+                <Pagination
+                  currentPage={eventPage}
+                  totalPages={totalEventPages}
+                  totalItems={filteredEvents.length}
+                  pageSize={eventPageSize}
+                  pageSizeOptions={[10, 25, 50]}
+                  onPageChange={(p) => setEventPage(p)}
+                  onPageSizeChange={(sz) => {
+                    setEventPageSize(sz);
+                    setEventPage(1);
+                  }}
+                />
+              ) : null
+            }
+          >
             {eventsLoading ? (
               <TableLoadingState rows={6} cols={7} />
             ) : filteredEvents.length === 0 ? (
@@ -657,162 +674,146 @@ export default function AdminDashboardPage() {
                 }
               />
             ) : (
-              <>
-                <table className="w-full text-left border-collapse">
-                  <TableHeader>
-                    <tr>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Date &amp; Time</TableHead>
-                      <TableHead>Venue</TableHead>
-                      <TableHead>Attendance</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead align="right">Actions</TableHead>
-                    </tr>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedEvents.map((ev) => {
-                      const evDate = new Date(ev.dateTime).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      });
-                      const evTime = new Date(ev.dateTime).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      });
+              <table className="w-full min-w-[1040px] text-left border-collapse table-fixed">
+                <TableHeader>
+                  <tr>
+                    <TableHead className="w-[330px]">Event</TableHead>
+                    <TableHead className="w-[120px]">Category</TableHead>
+                    <TableHead className="w-[140px]">Date &amp; Time</TableHead>
+                    <TableHead className="w-[180px]">Venue</TableHead>
+                    <TableHead className="w-[140px]">Attendance</TableHead>
+                    <TableHead className="w-[110px]">Status</TableHead>
+                    <TableHead align="right" className="w-[70px] text-right">Actions</TableHead>
+                  </tr>
+                </TableHeader>
+                <TableBody>
+                  {paginatedEvents.map((ev) => {
+                    const evDate = new Date(ev.dateTime).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    });
+                    const evTime = new Date(ev.dateTime).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    });
 
-                      const regCount = ev.registeredCount || 0;
-                      const cap = ev.capacity || 1;
-                      const pct = Math.min(100, Math.round((regCount / cap) * 100));
+                    const regCount = ev.registeredCount || 0;
+                    const cap = ev.capacity || 1;
+                    const pct = Math.min(100, Math.round((regCount / cap) * 100));
 
-                      let barColor = 'bg-[#0F172A]';
-                      if (ev.isDeleted) {
-                        barColor = 'bg-[#64748B]';
-                      } else if (pct >= 100) {
-                        barColor = 'bg-[#DC2626]';
-                      } else if (pct >= 80) {
-                        barColor = 'bg-[#D97706]';
-                      }
+                    let barColor = 'bg-[#0F172A]';
+                    if (ev.isDeleted) {
+                      barColor = 'bg-[#64748B]';
+                    } else if (pct >= 100) {
+                      barColor = 'bg-[#DC2626]';
+                    } else if (pct >= 80) {
+                      barColor = 'bg-[#D97706]';
+                    }
 
-                      return (
-                        <TableRow
-                          key={ev._id}
-                          className={ev.isDeleted ? 'bg-[#F8FAFC] opacity-75' : ''}
-                        >
-                          {/* Column 1: Event (40px thumbnail, 6px radius) */}
-                          <TableCell className="max-w-[280px]">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={ev.imageUrl}
-                                alt=""
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src =
-                                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
-                                }}
-                                className="w-10 h-10 rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
+                    return (
+                      <TableRow
+                        key={ev._id}
+                        className={ev.isDeleted ? 'bg-[#F8FAFC] opacity-75' : ''}
+                      >
+                        {/* Column 1: Event (40px thumbnail, 6px radius) */}
+                        <TableCell className="w-[330px] max-w-[330px] overflow-hidden">
+                          <div className="flex items-center gap-3 w-full min-w-0">
+                            <img
+                              src={ev.imageUrl}
+                              alt=""
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src =
+                                  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
+                              }}
+                              className="w-10 h-10 rounded-[6px] object-cover shrink-0 border border-[#E2E8F0]"
+                            />
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenDrawer(ev)}
+                                title={ev.title}
+                                className="font-medium text-[14px] leading-[20px] text-[#0F172A] hover:underline truncate block w-full max-w-full text-left transition-colors cursor-pointer"
+                              >
+                                {ev.title}
+                              </button>
+                              <span
+                                title={ev.description}
+                                className="text-[12px] leading-[16px] text-[#64748B] font-normal truncate block w-full max-w-full"
+                              >
+                                {ev.description}
+                              </span>
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        {/* Column 2: Category (plain gray text) */}
+                        <TableCell className="w-[120px] whitespace-nowrap overflow-hidden">
+                          <CategoryBadge category={ev.category} />
+                        </TableCell>
+
+                        {/* Column 3: Date & Time (Date line 1, Time line 2 in muted gray) */}
+                        <TableCell className="w-[140px] whitespace-nowrap tabular-nums">
+                          <span className="text-[14px] leading-[20px] font-normal text-[#0F172A] block">
+                            {evDate}
+                          </span>
+                          <span className="text-[12px] leading-[16px] text-[#64748B] block">
+                            {evTime}
+                          </span>
+                        </TableCell>
+
+                        {/* Column 4: Venue (plain text, ellipsis + tooltip) */}
+                        <TableCell className="w-[180px] max-w-[180px] overflow-hidden whitespace-nowrap">
+                          <span
+                            title={ev.venue}
+                            className="text-[14px] leading-[20px] text-[#0F172A] font-normal truncate block w-full max-w-full"
+                          >
+                            {ev.venue}
+                          </span>
+                        </TableCell>
+
+                        {/* Column 5: Attendance (75 / 120 and 4px bar) */}
+                        <TableCell className="w-[140px] whitespace-nowrap">
+                          <div className="w-28">
+                            <div className="text-[13px] font-normal tabular-nums text-[#0F172A] mb-1">
+                              {regCount} / {cap}
+                            </div>
+                            <div className="w-full h-1 bg-[#F1F5F9] rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${barColor}`}
+                                style={{ width: `${pct}%` }}
                               />
-                              <div className="min-w-0 flex-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenDrawer(ev)}
-                                  title={ev.title}
-                                  className="font-medium text-[14px] leading-[20px] text-[#0F172A] hover:underline truncate block text-left transition-colors cursor-pointer"
-                                >
-                                  {ev.title}
-                                </button>
-                                <span
-                                  title={ev.description}
-                                  className="text-[12px] leading-[16px] text-[#64748B] font-normal truncate block"
-                                >
-                                  {ev.description}
-                                </span>
-                              </div>
                             </div>
-                          </TableCell>
+                          </div>
+                        </TableCell>
 
-                          {/* Column 2: Category (plain gray text) */}
-                          <TableCell className="whitespace-nowrap">
-                            <CategoryBadge category={ev.category} />
-                          </TableCell>
+                        {/* Column 6: Status (6px dot + text) */}
+                        <TableCell className="w-[110px] whitespace-nowrap">
+                          <StatusBadge
+                            status={ev.status}
+                            seatsLeft={ev.seatsLeft}
+                            capacity={ev.capacity}
+                            registeredCount={ev.registeredCount}
+                            isDeleted={ev.isDeleted}
+                          />
+                        </TableCell>
 
-                          {/* Column 3: Date & Time (Date line 1, Time line 2 in muted gray) */}
-                          <TableCell className="whitespace-nowrap tabular-nums">
-                            <span className="text-[14px] leading-[20px] font-normal text-[#0F172A] block">
-                              {evDate}
-                            </span>
-                            <span className="text-[12px] leading-[16px] text-[#64748B] block">
-                              {evTime}
-                            </span>
-                          </TableCell>
-
-                          {/* Column 4: Venue (plain text, ellipsis + tooltip) */}
-                          <TableCell className="whitespace-nowrap">
-                            <span
-                              title={ev.venue}
-                              className="text-[14px] leading-[20px] text-[#0F172A] font-normal truncate max-w-[170px] block"
-                            >
-                              {ev.venue}
-                            </span>
-                          </TableCell>
-
-                          {/* Column 5: Attendance (75 / 120 and 4px bar) */}
-                          <TableCell className="whitespace-nowrap">
-                            <div className="w-28">
-                              <div className="text-[13px] font-normal tabular-nums text-[#0F172A] mb-1">
-                                {regCount} / {cap}
-                              </div>
-                              <div className="w-full h-1 bg-[#F1F5F9] rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full transition-all duration-300 ${barColor}`}
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TableCell>
-
-                          {/* Column 6: Status (6px dot + text) */}
-                          <TableCell className="whitespace-nowrap">
-                            <StatusBadge
-                              status={ev.status}
-                              seatsLeft={ev.seatsLeft}
-                              capacity={ev.capacity}
-                              registeredCount={ev.registeredCount}
-                              isDeleted={ev.isDeleted}
-                            />
-                          </TableCell>
-
-                          {/* Column 7: Actions ("..." row menu) */}
-                          <TableCell align="right" className="whitespace-nowrap">
-                            <RowActionMenu
-                              event={ev}
-                              onView={handleOpenDrawer}
-                              onEdit={handleOpenEdit}
-                              onDelete={handleOpenDelete}
-                              onRestore={handleRestoreEvent}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </table>
-
-                {/* Pagination */}
-                <Pagination
-                  currentPage={eventPage}
-                  totalPages={totalEventPages}
-                  totalItems={filteredEvents.length}
-                  pageSize={eventPageSize}
-                  pageSizeOptions={[10, 25, 50]}
-                  onPageChange={(p) => setEventPage(p)}
-                  onPageSizeChange={(sz) => {
-                    setEventPageSize(sz);
-                    setEventPage(1);
-                  }}
-                />
-              </>
+                        {/* Column 7: Actions ("..." row menu) */}
+                        <TableCell align="right" className="w-[70px] whitespace-nowrap text-right">
+                          <RowActionMenu
+                            event={ev}
+                            onView={handleOpenDrawer}
+                            onEdit={handleOpenEdit}
+                            onDelete={handleOpenDelete}
+                            onRestore={handleRestoreEvent}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </table>
             )}
           </Table>
         </div>
@@ -908,7 +909,24 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Registrations Data Table */}
-          <Table>
+          <Table
+            footer={
+              !regLoading && filteredRegistrations.length > 0 ? (
+                <Pagination
+                  currentPage={regPage}
+                  totalPages={totalRegPages}
+                  totalItems={filteredRegistrations.length}
+                  pageSize={regPageSize}
+                  pageSizeOptions={[10, 25, 50]}
+                  onPageChange={(p) => setRegPage(p)}
+                  onPageSizeChange={(sz) => {
+                    setRegPageSize(sz);
+                    setRegPage(1);
+                  }}
+                />
+              ) : null
+            }
+          >
             {regLoading ? (
               <TableLoadingState rows={6} cols={4} />
             ) : filteredRegistrations.length === 0 ? (
@@ -937,61 +955,45 @@ export default function AdminDashboardPage() {
                 }
               />
             ) : (
-              <>
-                <table className="w-full text-left border-collapse">
-                  <TableHeader>
-                    <tr>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Contact Number</TableHead>
-                      <TableHead>Registered On</TableHead>
-                    </tr>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedRegistrations.map((reg) => (
-                      <TableRow key={reg._id}>
-                        {/* Column 1: Name */}
-                        <TableCell className="font-medium text-[#0F172A] whitespace-nowrap">
-                          {reg.fullName}
-                        </TableCell>
+              <table className="w-full min-w-[760px] text-left border-collapse table-fixed">
+                <TableHeader>
+                  <tr>
+                    <TableHead className="w-[220px]">Name</TableHead>
+                    <TableHead className="w-[260px]">Email</TableHead>
+                    <TableHead className="w-[160px]">Contact Number</TableHead>
+                    <TableHead className="w-[120px]">Registered On</TableHead>
+                  </tr>
+                </TableHeader>
+                <TableBody>
+                  {paginatedRegistrations.map((reg) => (
+                    <TableRow key={reg._id}>
+                      {/* Column 1: Name */}
+                      <TableCell className="w-[220px] max-w-[220px] font-medium text-[#0F172A] truncate overflow-hidden">
+                        {reg.fullName}
+                      </TableCell>
 
-                        {/* Column 2: Email */}
-                        <TableCell className="text-[#64748B] whitespace-nowrap">
-                          {reg.email}
-                        </TableCell>
+                      {/* Column 2: Email */}
+                      <TableCell className="w-[260px] max-w-[260px] text-[#64748B] truncate overflow-hidden">
+                        {reg.email}
+                      </TableCell>
 
-                        {/* Column 3: Contact Number */}
-                        <TableCell className="text-[#64748B] tabular-nums whitespace-nowrap">
-                          {reg.contactNumber ? `+91 ${reg.contactNumber}` : '—'}
-                        </TableCell>
+                      {/* Column 3: Contact Number */}
+                      <TableCell className="w-[160px] text-[#64748B] tabular-nums whitespace-nowrap">
+                        {reg.contactNumber ? `+91 ${reg.contactNumber}` : '—'}
+                      </TableCell>
 
-                        {/* Column 4: Registered On */}
-                        <TableCell className="text-[#64748B] tabular-nums whitespace-nowrap">
-                          {new Date(reg.createdAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </table>
-
-                {/* Pagination */}
-                <Pagination
-                  currentPage={regPage}
-                  totalPages={totalRegPages}
-                  totalItems={filteredRegistrations.length}
-                  pageSize={regPageSize}
-                  pageSizeOptions={[10, 25, 50]}
-                  onPageChange={(p) => setRegPage(p)}
-                  onPageSizeChange={(sz) => {
-                    setRegPageSize(sz);
-                    setRegPage(1);
-                  }}
-                />
-              </>
+                      {/* Column 4: Registered On */}
+                      <TableCell className="w-[120px] text-[#64748B] tabular-nums whitespace-nowrap">
+                        {new Date(reg.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </table>
             )}
           </Table>
         </div>
